@@ -63,11 +63,11 @@
   /* Case study side nav hamburger */
   .section-nav-hamburger { display: none; }
   @media (max-width: 780px) {
-    .section-nav-sidebar { display: none !important; }
-    .section-nav-hamburger { display: block; position: sticky; top: 72px; z-index: 100; }
-    .case-study-inner { padding-left: 24px !important; padding-right: 24px !important; }
+    .section-nav-sidebar       { display: none !important; }
+    .section-nav-sidebar-wrap  { display: none !important; }
+    .section-nav-hamburger     { display: block; }
+    .case-study-inner { padding-left: 24px !important; padding-right: 24px !important; gap: 0 !important; }
     .case-study-back  { padding-left: 24px !important; }
-    .case-study-hamburger-wrap { display: block !important; }
   }
   .snav-dropdown {
     display: none;
@@ -837,7 +837,7 @@ function SectionNav({ sections, activeId, mobileOnly = false, desktopOnly = fals
   });
 
   if (mobileOnly) return (
-    <div className="section-nav-hamburger" ref={menuRef} style={{ position: 'relative' }}>
+    <div className="section-nav-hamburger" ref={menuRef} style={{ position: 'relative', display: 'inline-block' }}>
       <button
         onClick={() => setOpen(o => !o)}
         style={{
@@ -855,8 +855,7 @@ function SectionNav({ sections, activeId, mobileOnly = false, desktopOnly = fals
           <span style={{ display: 'block', width: 12, height: 2, background: C.green, borderRadius: 2 }} />
           <span style={{ display: 'block', width: 16, height: 2, background: C.green, borderRadius: 2 }} />
         </span>
-        <span>{activeLabel}</span>
-        <span style={{ marginLeft: 4, fontSize: 10, color: C.greenMuted }}>{open ? '▲' : '▼'}</span>
+        <span style={{ fontSize: 10, color: C.greenMuted }}>{open ? '▲' : '▼'}</span>
       </button>
       <div className={`snav-dropdown${open ? ' open' : ''}`}>
         {navList.map(sec => {
@@ -988,15 +987,15 @@ function CaseStudyPage({ projectId, onBack, onProject }) {
       <div className="case-study-back" style={{ paddingLeft: 100, paddingBottom: 32 }}>
         <NavLink label="← Back" onClick={onBack} />
       </div>
-      {/* Hamburger shown only on narrow screens — sits above the card */}
-      <div className="case-study-back" style={{ paddingLeft: 32, paddingRight: 32, marginBottom: 12 }}>
+      {/* Hamburger — narrow screens only, sits above the card */}
+      <div className="case-study-back" style={{ paddingLeft: 32, paddingRight: 32, marginBottom: 16, position: 'sticky', top: 72, zIndex: 100 }}>
         <SectionNav sections={project.sections} activeId={activeId} mobileOnly />
       </div>
 
       <div className="case-study-inner" style={{ display: 'flex', gap: 60, paddingLeft: 100, paddingRight: 80, maxWidth: 1300 }}>
 
-        {/* Sidebar nav — hidden on narrow screens via CSS */}
-        <div style={{ width: 130, flexShrink: 0 }}>
+        {/* Sidebar nav — wrapper + inner both hidden on narrow screens */}
+        <div className="section-nav-sidebar-wrap" style={{ width: 130, flexShrink: 0 }}>
           <SectionNav sections={project.sections} activeId={activeId} desktopOnly />
         </div>
 
@@ -1188,12 +1187,10 @@ function AboutPage() {
               My professional story goes like this: I began to think about User Experiences back when my brother programmed the Apple IIe LOGO (turtle) to respond to a joystick back in the very early &lsquo;80s. Over the next couple of decades, I took my degree in Psychology from Swarthmore College and applied it to a career focused on the internet. Bouncing back and forth between design, research, and programming at places like CBS and Sony, I then combined my passions by getting an MS in Systems &amp; Information Engineering focused on Human Factors from the University of Virginia. From there, I settled down in the city I fell in love with, Seattle, and have been privileged to work as a Director of UX, Interactive Designer and User Researcher with companies such as Aperture.ai, Amazon, the Gates Foundation, Google, Microsoft, NASA, Nintendo, Pokemon and many more.
             </p>
           </div>
-          <div className="about-img" style={{
-            width: '100%', aspectRatio: '4 / 3', borderRadius: 16, overflow: 'hidden',
-            background: "url('assets/about-family.png') no-repeat",
-            backgroundSize: '210%',
-            backgroundPosition: '92% 14%',
-          }} aria-label="Jonathan with his family" />
+          <div className="about-img" style={{ width: '100%', borderRadius: 20, overflow: 'hidden', aspectRatio: '4 / 3' }}>
+            <img src="assets/about-family.png" alt="Jonathan with his family"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '92% 14%', display: 'block' }} />
+          </div>
         </div>
       </div>
     </main>
