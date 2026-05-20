@@ -1,0 +1,226 @@
+/**
+ * Jonathan-Evans Design System
+ * colors_and_type.css
+ *
+ * CSS custom properties for colors and typography.
+ * Import this file first in any project using this design system.
+ *
+ * FONT SETUP: Poppins and Open Sans are loaded from Google Fonts.
+ * Add this <link> to your HTML <head>:
+ *   <link rel="preconnect" href="https://fonts.googleapis.com">
+ *   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400&family=Poppins:wght@200;400;500&display=swap" rel="stylesheet">
+ *
+ * NOTE: No local font files were provided; Google Fonts CDN is used.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@200;300;400;500&display=swap');
+
+/* ─── BASE COLOR PALETTE ─────────────────────────────────── */
+:root {
+  --color-ink:           rgb(26, 27, 31);      /* primary text / headings */
+  --color-green:         rgb(55, 126, 34);     /* interactive ONLY — links, CTAs, nav */
+  --color-green-muted:   rgb(118, 153, 116);   /* section header borders (decorative) */
+  --color-green-light:   rgb(212, 219, 214);   /* card borders, dividers */
+  --color-green-subtle:  rgb(233, 237, 234);   /* outermost card borders */
+  --color-warm-white:    rgb(247, 249, 246);   /* page background, secondary fills */
+  --color-white:         rgb(255, 255, 255);   /* header bg, card surface */
+  --color-gray:          rgb(158, 158, 158);   /* secondary / supporting text */
+  --color-shadow:        rgba(0, 0, 0, 0.25);  /* header drop shadow */
+
+  /* ─── SEMANTIC COLOR ALIASES ─────────────────────────────── */
+  --fg-primary:          var(--color-ink);
+  --fg-secondary:        var(--color-gray);
+  --fg-interactive:      var(--color-green);   /* links, nav items, CTAs ONLY */
+  --bg-page:             var(--color-warm-white);
+  --bg-surface:          var(--color-white);
+  --bg-section:          var(--color-warm-white);
+  --border-card:         var(--color-green-subtle);
+  --border-card-inner:   var(--color-green-light);
+  --border-section:      var(--color-green-muted);
+
+  /* ─── FONT FAMILIES ─────────────────────────────────────── */
+  --font-display:        'Poppins', sans-serif;
+  --font-body:           'Open Sans', sans-serif;
+
+  /* ─── FONT WEIGHTS ──────────────────────────────────────── */
+  --fw-extralight:       200;
+  --fw-light:            300;
+  --fw-regular:          400;
+  --fw-medium:           500;
+
+  /* ─── TYPE SCALE ─────────────────────────────────────────── */
+  --text-display:        48px;   /* project/page titles — Poppins ExtraLight */
+  --text-heading:        24px;   /* section subtitles — Poppins Regular */
+  --text-section:        20px;   /* card section headers — Poppins Regular */
+  --text-nav:            12px;   /* navigation, sidebar labels — Poppins Medium */
+  --text-body:           16px;   /* body copy — Open Sans Regular */
+
+  /* ─── LINE HEIGHTS ───────────────────────────────────────── */
+  --lh-tight:            1;      /* display & heading */
+  --lh-body:             1.6;    /* body copy */
+
+  /* ─── SPACING ────────────────────────────────────────────── */
+  --space-xs:            10px;
+  --space-sm:            20px;
+  --space-md:            38px;
+  --space-lg:            50px;
+  --space-xl:            100px;
+
+  /* ─── BORDER RADIUS ─────────────────────────────────────── */
+  --radius-card:         20px;
+  --radius-inner:        10px;
+  --radius-none:         0px;
+
+  /* ─── SHADOWS ────────────────────────────────────────────── */
+  --shadow-header:       0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+
+  /* ─── LAYOUT ─────────────────────────────────────────────── */
+  --max-width:           1440px;
+  --header-height:       149px;
+  --page-margin:         100px;
+  --content-left:        290px;
+  --content-width:       850px;
+  --sidebar-left:        100px;
+}
+
+/* ─── SEMANTIC ELEMENT DEFAULTS ─────────────────────────────── */
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-body);
+  color: var(--fg-primary);
+  background-color: var(--bg-page);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Display title — project/page name */
+.je-display,
+h1 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-extralight);
+  font-size: var(--text-display);
+  line-height: var(--lh-tight);
+  color: var(--fg-primary);
+  margin: 0;
+}
+
+/* Heading — subtitle / category */
+.je-heading,
+h2 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-regular);
+  font-size: var(--text-heading);
+  line-height: var(--lh-tight);
+  color: var(--fg-secondary);
+  margin: 0;
+}
+
+/* Section header — card section title */
+.je-section-header,
+h3 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-regular);
+  font-size: var(--text-section);
+  line-height: var(--lh-tight);
+  color: var(--fg-primary);
+  border-bottom: 1px solid var(--border-section);
+  padding-bottom: 6px;
+  margin: 0 0 12px 0;
+}
+
+/* Nav / sidebar label */
+.je-nav-link,
+.je-label {
+  font-family: var(--font-display);
+  font-weight: var(--fw-medium);
+  font-size: var(--text-nav);
+  line-height: var(--lh-tight);
+  color: var(--fg-interactive);
+  text-decoration: none;
+}
+
+.je-nav-link:hover {
+  text-decoration: underline;
+}
+
+/* Body paragraph */
+.je-body,
+p {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-body);
+  color: var(--fg-primary);
+  margin: 0 0 1em 0;
+}
+
+/* Secondary / supporting text */
+.je-secondary {
+  color: var(--fg-secondary);
+}
+
+/* Interactive text (links, CTAs) */
+a, .je-link {
+  color: var(--fg-interactive);
+  text-decoration: none;
+}
+
+a:hover, .je-link:hover {
+  text-decoration: underline;
+}
+
+/* ─── CARD COMPONENTS ────────────────────────────────────────── */
+
+/* Outer content card */
+.je-card {
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-card);
+  background-color: var(--bg-surface);
+  padding: var(--space-sm);
+}
+
+/* Inner card (paired/side-by-side) */
+.je-card-inner {
+  border-radius: var(--radius-inner);
+  border: 1px solid var(--border-card-inner);
+  background-color: var(--bg-surface);
+  padding: var(--space-sm);
+}
+
+/* Highlighted section fill */
+.je-card-highlight {
+  border-radius: var(--radius-inner);
+  background-color: var(--bg-section);
+  padding: var(--space-sm);
+}
+
+/* ─── HEADER ─────────────────────────────────────────────────── */
+
+.je-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-height);
+  background-color: var(--bg-surface);
+  box-shadow: var(--shadow-header);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--page-margin);
+  z-index: 100;
+}
+
+/* ─── SIDEBAR NAV ────────────────────────────────────────────── */
+
+.je-sidebar {
+  position: fixed;
+  top: calc(var(--header-height) + 60px);
+  left: var(--sidebar-left);
+  display: flex;
+  flex-direction: column;
+  gap: 38px;
+}

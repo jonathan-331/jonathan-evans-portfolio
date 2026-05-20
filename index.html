@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jonathan Hilton Evans</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@200;300;400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    background: rgb(247,249,246);
+    color: rgb(26,27,31);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-thumb { background: rgb(212,219,214); border-radius: 3px; }
+  .fade-in {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+  .section-anchor { scroll-margin-top: 80px; }
+  a { color: rgb(55,126,34); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Responsive logo hide */
+  @media (max-width: 680px) {
+    .header-logo { display: none !important; }
+  }
+  /* Responsive card grid */
+  @media (max-width: 700px) {
+    .card-grid { grid-template-columns: 1fr !important; }
+  }
+  /* Responsive hero padding */
+  @media (max-width: 860px) {
+    .home-main { padding-left: 32px !important; padding-right: 32px !important; }
+    .hero-name  { font-size: 28px !important; }
+    .hero-tagline { font-size: 28px !important; }
+  }
+
+  /* Prev/Next case study buttons */
+  .prev-next-btn { transition: background-color 0.18s ease; }
+  .prev-next-btn:hover { background-color: rgb(246,248,245); }
+  .prev-next-btn:hover, .prev-next-btn:hover * { text-decoration: none !important; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const C = {
+  ink:         'rgb(26,27,31)',
+  green:       'rgb(55,126,34)',
+  greenMuted:  'rgb(118,153,116)',
+  greenLight:  'rgb(212,219,214)',
+  greenSubtle: 'rgb(233,237,234)',
+  warmWhite:   'rgb(247,249,246)',
+  white:       '#fff',
+  gray:        'rgb(158,158,158)',
+};
+
+/* ── FADE IN ── */
+function useFadeIn(delay = 0) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { el.classList.add('visible'); obs.disconnect(); } },
+      { threshold: 0.08 }
+    );
+    const t = setTimeout(() => obs.observe(el), delay);
+    return () => { clearTimeout(t); obs.disconnect(); };
+  }, [delay]);
+  return ref;
+}
+
+/* ── NAV LINK — Poppins Medium 12px green; active = muted green + dot ── */
+function NavLink({ label, active, onClick, href }) {
+  const [hov, setHov] = useState(false);
+  return (
+    <a
+      href={href || '#'}
+      target={href && href.startsWith('http') ? '_blank' : undefined}
+      rel={href && href.startsWith('http') ? 'noopener noreferrer' : undefined}
+      onClick={e => { if (!href || href === '#') { e.preventDefault(); onClick && onClick(); } }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        fontFamily: "'Poppins', sans-serif",
+        fontWeight: 500,
+        fontSize: 12,
+        lineHeight: 1,
+        color: active ? C.greenMuted : C.green,
+        textDecoration: (!active && hov) ? 'underline' : 'none',
+        cursor: 'pointer',
+        letterSpacing: '0.01em',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 5,
+      }}>
+      {active && <span style={{ width: 5, height: 5, borderRadius: '50%', background: C.greenMuted, flexShrink: 0, display: 'inline-block' }} />}
+      {label}
+    </a>
+  );
+}
+
+/* ── HEADER ── */
+function Header({ screen, onNav }) {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 8);
+    window.addEventListener('scroll', fn);
+    return () => window.removeEventListener('scroll', fn);
+  }, []);
+
+  const navItems = [
+    { label: 'Home',     dest: 'home' },
+    { label: 'About',    dest: 'about' },
+    { label: 'Resume',   dest: 'resume' },
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/jonathanhevans/', dest: null },
+    { label: 'Contact',  href: 'mailto:jonathan@jonathan-evans.com', dest: null },
+  ];
+
+  return (
+    <header style={{
+      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
+      height: 64, background: C.white,
+      boxShadow: scrolled ? '0px 4px 4px 0px rgba(0,0,0,0.25)' : '0px 1px 0px 0px rgba(0,0,0,0.06)',
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '0 60px',
+      transition: 'box-shadow 0.3s ease',
+    }}>
+      <img src="assets/logo-je.png" alt="J·E" onClick={() => onNav('home')}
+        className="header-logo"
+        style={{ height: 36, cursor: 'pointer', flexShrink: 0 }} />
+      <nav style={{ display: 'flex', gap: 40, alignItems: 'center', marginLeft: 'auto' }}>
+        {navItems.map(item => (
+          <NavLink
+            key={item.label}
+            label={item.label.toUpperCase()}
+            active={screen === item.dest}
+            href={item.href}
+            onClick={item.dest ? () => onNav(item.dest) : undefined}
+          />
+        ))}
+      </nav>
+    </header>
+  );
+}
+
+/* ── PROJECT DATA ── */
+const PROJECTS = [
+  {
+    id: 'gates',
+    title: 'Gates Foundation',
+    subtitle: 'Knowledge Management',
+    category: 'Research, Design & Strategy',
+    cardImg: 'assets/cards/gates.png',
+    tags: ['UX Research', 'UX Strategy', 'Design'],
+    desc: 'Collaborated with the Knowledge Management department to develop Aurora, an AI-powered search engine designed to accelerate discovery of investment information across international organizations.',
+    sections: [
+      {
+        id: 'overview', label: 'Overview', layout: 'full',
+        content: `As part of the Gates Foundation's Human Centered Design group, I collaborated with the Knowledge Management department to develop Aurora, a powerful search engine designed to accelerate the discovery of investment information relating to international organizations. Initially conceived as a basic keyword search tool, Aurora evolved significantly through the integration of Azure AI, enabling the platform to intelligently analyze information across foundation documents and databases.\n\nA key priority was to ensure Aurora's accessibility and adaptability for a global user base with diverse roles and technical expertise. This involved designing an intuitive and user-friendly interface that seamlessly integrates into existing workflows.`,
+      },
+      {
+        id: 'problem', label: 'The Problem', layout: 'highlight',
+        content: `The Knowledge Management group faced the critical challenge of migrating their existing SharePoint-based search engine to a modern, web-based application. This necessitated a significant overhaul, including the integration of AI capabilities to enhance search accuracy and relevance.\n\nFurthermore, a deep understanding of user needs was required to ensure the new application was intuitive, user-friendly, and efficient. The evolving nature of AI technology required a dynamic and iterative design process, necessitating a flexible design system that could accommodate ongoing improvements and features.`,
+      },
+      {
+        id: 'contributions', label: 'My Contributions', layout: 'half-left', pairId: 'challenges',
+        content: `User research across a global community.\n\nCreation of a design system, to be used on various applications beyond this web app.\n\nCollaborate with developers to ensure effective implementation of the design system.\n\nEnsure the search engine is accessible and usable by users with diverse abilities.`,
+      },
+      {
+        id: 'challenges', label: 'Challenges', layout: 'half-right', pairId: 'contributions',
+        content: `Managing user expectations regarding the accuracy of search results.\n\nIncorporating an AI experience sooner than anticipated.\n\nEnsuring AI-powered features are transparent to users.\n\nIntegrating a very complex information architecture.\n\nLimitations of foundation staff availability for user research.`,
+      },
+      {
+        id: 'compiling', label: 'Compiling All Resources', layout: 'full',
+        content: `Building upon previous research and design explorations conducted by the Human Centered Design team, I consolidated existing findings into a comprehensive slide deck, capturing insights and learnings from past user experience work.\n\nThis deck enabled the team to gain a shared understanding of past work, identify key learnings, and establish a common ground for moving forward. This resource has been frequently referenced by the team, significantly streamlining the project initiation process.`,
+        image: { caption: 'Consolidated research and design findings deck', src: 'assets/projects/gates/documents-reviewed.jpg', bg: '#e8edf2' },
+      },
+      {
+        id: 'prototype', label: 'Initial Prototype', layout: 'full',
+        content: `Soon after joining the project, I led the research and design of a prototype of the search experience to be used to support another group in providing data to Knowledge Management. This required a rapid turnaround, necessitating quick iteration between design and development, including integrating with Airtable.\n\nI created a clickable prototype and conducted initial user testing to gather feedback and refine the design. The learnings from this iterative process were crucial in informing the design and development of the official application.`,
+        image: { caption: 'Initial prototype — search interface built on Airtable', src: 'assets/projects/gates/chat-wireframe.png', bg: '#eef2f7' },
+      },
+      {
+        id: 'designsystem', label: 'Creation of the Design System', layout: 'full',
+        content: `Building upon the learnings from the prototype, I led the creation of a new design system for Aurora, expanding upon the Fluent 2 framework. I collaborated with developers to customize and extend Fluent 2, creating new components and style guides tailored to the specific business, user and data requirements.\n\nThis new design system ensured consistency across the user interface, improved development efficiency, and ultimately enhanced the overall user experience.`,
+        image: { caption: 'Aurora design system — component library built on Fluent 2', src: 'assets/projects/gates/design-system.jpg', bg: '#f0f4f8' },
+      },
+      {
+        id: 'azureai', label: 'Launching with Azure AI', layout: 'full',
+        content: `As the project progressed, the rapid advancements in AI technology necessitated a faster-than-anticipated integration of AI search capabilities. I led the design of the AI-powered search features, conducting user research to understand user expectations and concerns regarding AI.\n\nWe focused on developing clear and concise explanations of how AI was being used to enhance search results, while also addressing potential challenges such as bias and transparency.`,
+        image: { caption: 'Aurora — AI-powered search experience with Azure Cognitive Services', src: 'assets/projects/gates/aurora-exact-match.png', bg: '#eef3f7' },
+      },
+      {
+        id: 'expansion', label: 'Expanding the Product', layout: 'full',
+        content: `Following the launch of Aurora, I synthesized user feedback to help define the strategic roadmap for the product's next phase. I focused on expanding beyond basic search, detailing requirements for interactive geographic maps, data visualizations, and generative AI integration.\n\nI delivered a comprehensive plan to the product team, positioning Aurora to evolve into a more proactive and conversational knowledge engine.`,
+        image: { caption: 'User satisfaction trend matrix — tracking adoption across regions', src: 'assets/projects/gates/map-wireframe.png', bg: '#f2f5f0' },
+      },
+      {
+        id: 'outcomes', label: 'Outcomes', layout: 'full',
+        content: `Developed a comprehensive search experience for the Knowledge Management group.\n\nEstablished a robust and adaptable design system.\n\nIntegrated AI-powered search capabilities.\n\nConducted thorough user research across a global community.\n\nLaunched a web application that can be iterated and expanded upon.`,
+      },
+    ],
+  },
+  {
+    id: 'aperture',
+    title: 'Aperture',
+    subtitle: 'Aperture.ai',
+    category: 'UX Design Director',
+    cardImg: 'assets/cards/aperture.png',
+    tags: ['Leadership', 'Design Systems', 'Rebrand'],
+    desc: 'Served as Director of UX at Aperture (formerly Artemis Intelligence), an AI-powered platform that empowers companies to identify and capitalize on new market and innovation opportunities.',
+    sections: [
+      {
+        id: 'overview', label: 'Overview', layout: 'full',
+        content: `Aperture is an AI-powered web application that empowers companies to identify and capitalize on new market and innovation opportunities. By extracting and analyzing information from millions of documents — including research papers, news articles, and patent filings — Aperture uncovers and groups common problems and unmet needs across the marketplace, providing valuable insights for product development, market entry, and strategic planning.`,
+      },
+      {
+        id: 'problem', label: 'The Problem', layout: 'highlight',
+        content: `Aperture, while promising in its ability to identify market opportunities, suffered from significant usability issues. The existing interface was confusing and difficult to navigate, preventing users from effectively leveraging the platform's powerful insights.\n\nThe company also lacked a cohesive brand identity and a clear design direction, making it difficult to communicate its value proposition to potential customers and investors.`,
+      },
+      {
+        id: 'contributions', label: 'My Contributions', layout: 'half-left', pairId: 'challenges',
+        content: `Department director and team builder.\n\nCreation of design strategy.\n\nUX design and research.\n\nFacilitated company-wide workshops to define vision, establish brand identity, and develop a shared understanding of user needs.`,
+      },
+      {
+        id: 'challenges', label: 'Challenges', layout: 'half-right', pairId: 'contributions',
+        content: `Workshopping product features with diverse stakeholders.\n\nCombining business goals and user needs.\n\nComplex information architecture.\n\nEstablishing a design structure from the ground up.`,
+      },
+      {
+        id: 'interview', label: 'Interview + Play', layout: 'full',
+        content: `To effectively design and develop Aperture, I conducted a series of user interviews with potential users, including Product Managers, Innovation Managers, and Market Research Analysts. These interviews revealed key insights into their challenges, goals, and information-seeking behaviors.\n\nI supplemented interviews with participatory design sessions — inviting users to sketch and describe their ideal workflows. This "play" component surfaced latent needs that structured interviews would have missed.`,
+        image: { caption: 'Affinity mapping session — clustering user needs from interview data', src: 'assets/projects/aperture/speak-your-mind.png', bg: '#f5f0f8' },
+      },
+      {
+        id: 'synthesis', label: 'Synthesis', layout: 'full',
+        content: `Following the research phase, I synthesized findings into actionable insights that informed the product roadmap and design direction. I developed user personas, journey maps, and opportunity matrices to represent the diverse needs and behaviors of Aperture's target users.\n\nThese artifacts served as alignment tools across the organization — giving stakeholders a shared language to discuss user needs and prioritize features.`,
+        image: { caption: 'Synthesis artifacts — personas and opportunity matrix', src: 'assets/projects/aperture/user-types.png', bg: '#f0f4f8' },
+      },
+      {
+        id: 'sorting', label: 'Creative Sorting', layout: 'full',
+        content: `To address the complex information architecture challenge, I facilitated card sorting exercises with users to understand how they mentally categorize and navigate market intelligence data.\n\nThe findings directly informed the navigation structure and taxonomy of the Aperture platform, ensuring that the information architecture aligned with users' mental models rather than the company's internal terminology.`,
+      },
+      {
+        id: 'validation', label: 'Validation', layout: 'full',
+        content: `Before committing to a full redesign, I conducted usability testing on wireframes and low-fidelity prototypes to validate design decisions early. This iterative testing approach allowed us to identify and address usability issues quickly, saving significant development time and resources.\n\nMultiple rounds of testing with target users refined the core workflows and interaction patterns that became the foundation of the Aperture interface.`,
+        image: { caption: 'Wireframe validation sessions — testing navigation and core workflows', src: 'assets/projects/aperture/priorities.png', bg: '#f0f5f0' },
+      },
+      {
+        id: 'strategy', label: 'Product Strategy', layout: 'full',
+        content: `Based on the research and validation findings, I developed a comprehensive product strategy that outlined the vision, goals, and roadmap for the Aperture platform. This strategy aligned business objectives with user needs, providing a clear direction for the product's evolution.\n\nKey strategic decisions included focusing on the core value proposition of opportunity discovery, simplifying the onboarding experience, and creating a tiered feature set that catered to users with different levels of data sophistication.`,
+      },
+      {
+        id: 'brand', label: 'Creating a New Brand', layout: 'full',
+        content: `Upon joining, I identified a critical issue: the company name (Artemis Intelligence) did not clearly reflect its primary product, Aperture. I spearheaded a strategic rebranding initiative, collaborating closely with the company president, directors, and my design team.\n\nWe secured the Aperture.ai domain name, officially renamed the company, and developed a comprehensive brand guide that defined the company's visual identity, messaging strategy, and brand voice. The rebrand significantly improved market positioning and customer understanding of the product's value.`,
+        image: { caption: 'Aperture brand identity — logo, color system, and typography', src: 'assets/projects/aperture/marketing-page.png', bg: '#f8f0f4' },
+      },
+      {
+        id: 'userflows', label: 'User Flows', layout: 'full',
+        content: `I led the development of comprehensive user flows that mapped out the complete user journey within the Aperture platform — from initial login and onboarding through advanced analysis and insight extraction.\n\nThese flows served as the blueprint for development sprints, ensuring that the engineering team had a clear understanding of the intended user experience and could build features that supported natural user progression through the platform.`,
+        image: { caption: 'Core user flows — opportunity discovery and insight extraction', src: 'assets/projects/aperture/main-template.png', bg: '#eef2f7' },
+      },
+      {
+        id: 'measuring', label: 'Measuring Focus', layout: 'full',
+        content: `To measure the impact of design decisions, I established a set of key performance indicators tied to user engagement and task completion. Regular usability benchmarking sessions tracked progress against baseline metrics, providing objective evidence of design improvements.\n\nThese measurements helped build organizational confidence in the design process and justified continued investment in UX research and design activities.`,
+        image: { caption: 'Measuring Focus — engagement analytics dashboard', src: 'assets/projects/aperture/continuums.png', bg: '#f5f5f0' },
+      },
+      {
+        id: 'outcomes', label: 'Outcomes', layout: 'full',
+        content: `A more focused organization.\n\nA unified product vision.\n\nUser types and workflows clearly defined.\n\nA comprehensive design system (Apex).\n\nA dynamic organization rebrand to Aperture.ai.\n\nImproved user satisfaction scores across core workflows.`,
+      },
+    ],
+  },
+  {
+    id: 'nasa',
+    title: 'NASA DAACs',
+    subtitle: 'NASA',
+    category: 'Research & Design',
+    cardImg: 'assets/cards/nasa.png',
+    logo: 'assets/nasa-logo.png',
+    tags: ['UX Research', 'Design Strategy', 'Synthesis'],
+    desc: 'Led a large-scale research project with 91 scientists across 12 NASA Distributed Active Archive Centers to understand barriers to satellite data access and utilization.',
+    sections: [
+      {
+        id: 'overview', label: 'Overview', layout: 'full',
+        content: `I led a research project to understand the challenges scientists were facing in accessing and utilizing satellite data from NASA's 12 Distributed Active Archive Centers (DAACs). Through in-depth interviews with 91 scientists using 11 different DAAC websites, I identified key user types and pain points in the data access process.\n\nKey findings included significant variability in user experience across different DAACs, a lack of awareness of available data resources, and challenges in understanding and utilizing complex data formats. The research findings informed the development of new improved user experiences across the DAACs, leading to a significant increase in scientist satisfaction and data utilization.`,
+      },
+      {
+        id: 'problem', label: 'The Problem', layout: 'highlight',
+        content: `Despite NASA's significant investments in providing scientists with access to valuable satellite data through its DAACs, scientists were not utilizing these resources. This research aimed to understand the underlying reasons for the lack of scientist engagement, including identifying barriers to data access, understanding user needs, and evaluating the effectiveness of data dissemination across the different DAACs.\n\nThe goal was to identify key areas for improvement in data access and utilization to improve scientist engagement, leading to an increase in scientific discoveries.`,
+      },
+      {
+        id: 'contributions', label: 'My Contributions', layout: 'half-left', pairId: 'challenges',
+        content: `Led all aspects of the research project, including data collection, analysis, and reporting.\n\nDeveloped and analyzed qualitative data, including user interviews and observations.\n\nCreated user personas and journey maps to represent the diverse needs and behaviors of scientists.\n\nDeveloped actionable recommendations for improving data access, utilization, and user experience across the DAACs.\n\nPrepared and presented comprehensive research findings to NASA stakeholders.`,
+      },
+      {
+        id: 'challenges', label: 'Challenges', layout: 'half-right', pairId: 'contributions',
+        content: `Coordinating communication and messaging across 12 geographically dispersed DAACs and NASA.\n\nRecruiting a diverse and representative sample of 91 scientists from across the United States and internationally.\n\nEnsuring data consistency and comparability across diverse datasets.\n\nAnalyzing and synthesizing a large volume of data from 91 scientists.\n\nTelling a single narrative with actionable recommendations based on diverse perspectives.`,
+      },
+      {
+        id: 'validity', label: 'Validity and Reliability', layout: 'full',
+        content: `To ensure the validity and reliability of the research findings, I employed a rigorous mixed-methods approach. Quantitative data from system usage logs was triangulated with qualitative data from interviews and observational sessions.\n\nI established intercoder reliability protocols for qualitative analysis, with a second researcher independently coding a subset of interview transcripts. Agreement rates exceeded 85%, providing confidence in the consistency of the analytical framework applied across all 91 participant sessions.`,
+        image: { caption: 'Validity matrix — intercoder reliability across DAAC user segments', src: 'assets/projects/nasa/cocreation.png', bg: '#f0f4e8' },
+      },
+      {
+        id: 'heuristic', label: 'Heuristic Evaluation', layout: 'full',
+        content: `In parallel with user interviews, I conducted heuristic evaluations of all 11 DAAC websites using Nielsen's 10 usability heuristics. This systematic assessment identified 147 distinct usability issues across the sites, ranging from critical navigation failures to minor inconsistencies in terminology.\n\nThe heuristic findings provided an objective baseline against which interview-reported pain points could be validated, strengthening the overall evidence base for design recommendations presented to NASA stakeholders.`,
+        image: { caption: 'Heuristic evaluation scorecard across 11 DAAC websites', src: 'assets/projects/nasa/results-table.png', bg: '#f0f4ea' },
+      },
+      {
+        id: 'categorizing', label: 'Categorizing and Affect', layout: 'full',
+        content: `A key analytical challenge was making sense of the diverse emotional responses scientists had to their DAAC experiences. I developed a categorization framework that mapped scientist affect — frustration, confusion, satisfaction, discovery — to specific interface interactions and data access moments.\n\nThis affective mapping revealed that the highest-impact pain points were not always the most technically complex — small friction points in data search and download workflows generated disproportionate frustration and disengagement among scientists.`,
+      },
+      {
+        id: 'storylines', label: 'Story Lines', layout: 'full',
+        content: `To communicate the complexity of the research findings to a diverse stakeholder audience — including scientists, engineers, and NASA administrators — I developed a series of narrative "story lines" that illustrated key user journeys through the DAAC data access process.\n\nThese story lines translated abstract data patterns into compelling human narratives, making the research findings accessible and actionable for non-research stakeholders and building organizational empathy for the scientists' experience.`,
+        image: { caption: 'Scientist personas and journey narratives across DAAC user types', src: 'assets/projects/nasa/user-journeys.png', bg: '#f5f2e8' },
+      },
+      {
+        id: 'personas', label: 'Personas', layout: 'full',
+        content: `Based on the research findings, I developed three primary user personas representing the key scientist archetypes identified across the 91 interview participants: the Domain Expert, the Data Explorer, and the Collaborative Researcher.\n\nEach persona captured distinct goals, behaviors, technical proficiencies, and pain points — providing a shared reference model that aligned NASA teams around the diverse needs of the scientific community they serve.`,
+        image: { caption: 'Three primary DAAC user personas — based on 91 scientist interviews', src: 'assets/projects/nasa/user-types.png', bg: '#eef2f8' },
+      },
+      {
+        id: 'prototyping', label: 'Prototyping', layout: 'full',
+        content: `The research findings directly informed the development of design recommendations and interface prototypes for an improved DAAC user experience. I created wireframes and interactive prototypes that addressed the most critical pain points identified in the research.\n\nPrototypes were tested with a subset of research participants, allowing us to validate that the proposed design improvements effectively addressed the barriers to data access that had been identified. The results demonstrated significant improvements in task completion rates and user satisfaction.`,
+        image: { caption: 'DAAC prototype — streamlined data search and download interface', src: 'assets/projects/nasa/wireframe-suggestion.png', bg: '#f0f5f2' },
+      },
+      {
+        id: 'outcomes', label: 'Outcomes', layout: 'full',
+        content: `Conducted 91 in-depth interviews with scientists across 12 NASA DAACs.\n\nIdentified three primary user archetypes and their distinct data access needs.\n\nDelivered 147-issue heuristic evaluation across all 11 DAAC websites.\n\nDeveloped actionable design recommendations adopted by multiple DAACs.\n\nResearch findings led to measurable improvements in scientist satisfaction and data utilization rates.\n\nReducing data retrieval time by 67%, saving researchers over 10 hours weekly.`,
+      },
+    ],
+  },
+  {
+    id: 'powerplants',
+    title: 'Power Plants',
+    subtitle: '',
+    category: 'Design Strategy',
+    cardImg: 'assets/cards/power-plants.png',
+    tags: ['Design Strategy', 'Journey Maps', 'Workshops'],
+    desc: 'Design strategy engagement focused on power plant outage management and operations workflows.',
+    sections: [
+      {
+        id: 'overview', label: 'Overview', layout: 'full',
+        content: `This engagement focused on understanding and improving the workflow of power plant operations teams responsible for managing planned and unplanned outages. Power plant outage management is a high-stakes, time-sensitive process involving dozens of stakeholders, complex regulatory requirements, and significant financial implications.\n\nI led design strategy work to identify opportunities for improving how operations teams plan, coordinate, and execute outage management activities — with the goal of reducing downtime, improving safety, and enhancing team coordination.`,
+      },
+      {
+        id: 'problem', label: 'The Problem', layout: 'highlight',
+        content: `Power plant operations teams were managing critical outage workflows using outdated tools — a combination of spreadsheets, email chains, and disparate legacy systems. This fragmented approach led to communication breakdowns, missed maintenance windows, and costly unplanned downtime.\n\nThe core challenge was understanding how to bring modern design thinking to a highly regulated, safety-critical environment while respecting the expertise and established practices of experienced operations professionals.`,
+      },
+      {
+        id: 'contributions', label: 'My Contributions', layout: 'half-left', pairId: 'challenges',
+        content: `Led design strategy and research planning.\n\nContextual inquiry with plant operations teams.\n\nWorkflow mapping and process documentation.\n\nOpportunity identification and design brief development.\n\nStakeholder workshop facilitation.`,
+      },
+      {
+        id: 'challenges', label: 'Challenges', layout: 'half-right', pairId: 'contributions',
+        content: `Accessing a highly secure, regulated environment for research.\n\nBuilding trust with expert practitioners skeptical of outside consultants.\n\nBalancing safety requirements with workflow efficiency improvements.\n\nReconciling diverse stakeholder needs across operations, maintenance, and management.`,
+      },
+      {
+        id: 'living', label: 'Living in the System', layout: 'full',
+        content: `To truly understand the complexity of power plant operations, I embedded with plant teams during both normal operations and a scheduled outage event. This immersive contextual inquiry approach allowed me to observe the actual workflows, communication patterns, and decision-making processes that documentary research alone would have missed.\n\nKey observations included the critical role of informal communication networks, the cognitive load placed on shift supervisors during outage coordination, and the significant gap between documented procedures and actual operational practice.`,
+        image: { caption: 'Contextual inquiry — embedded observation during plant outage event', src: 'assets/projects/power-plants/journey-map.png', bg: '#f0f2f5' },
+      },
+      {
+        id: 'workshops', label: 'Design Workshops', layout: 'full',
+        content: `Following the contextual research phase, I facilitated a series of co-design workshops with cross-functional plant teams including operations, maintenance, engineering, and management. These workshops used structured ideation exercises to generate and prioritize design opportunities.\n\nParticipants mapped their current workflows, identified pain points, and collaboratively sketched concepts for improved tools and processes. The workshop outputs directly informed the design strategy recommendations delivered to the client.`,
+        image: { caption: 'Co-design workshop — cross-functional outage workflow mapping', src: 'assets/projects/power-plants/concept-cards.png', bg: '#eef0f5' },
+      },
+      {
+        id: 'userflows', label: 'User Types', layout: 'full',
+        content: `The research identified five distinct user types within the power plant operations ecosystem, each with unique roles, responsibilities, and information needs during outage events: the Shift Supervisor, the Maintenance Coordinator, the Engineering Lead, the Regulatory Compliance Officer, and the Plant Manager.\n\nUnderstanding the relationships and information flows between these user types was essential to designing solutions that supported the entire outage management ecosystem rather than optimizing for individual roles in isolation.`,
+      },
+      {
+        id: 'prototype', label: 'Concept Prototyping', layout: 'full',
+        content: `Based on the research findings and workshop outputs, I developed low-fidelity concept prototypes for a unified outage management interface. These prototypes focused on improving real-time visibility into outage status, streamlining cross-team communication, and reducing the cognitive burden on shift supervisors.\n\nConcept testing with operations teams validated the core design direction and surfaced specific requirements that shaped the detailed design recommendations delivered to the client.`,
+        image: { caption: 'Outage management concept — unified operations dashboard', src: 'assets/projects/power-plants/wireframe.png', bg: '#f0f3f5' },
+      },
+      {
+        id: 'outcomes', label: 'Outcomes', layout: 'full',
+        content: `Comprehensive workflow documentation across all outage management phases.\n\nFive detailed user personas representing key operational roles.\n\nIdentified 23 high-priority design opportunities across the outage management workflow.\n\nDesign strategy brief adopted as the foundation for a technology platform procurement process.\n\nCo-design workshops built organizational alignment around user-centered design principles.`,
+      },
+    ],
+  },
+  {
+    id: 'moen',
+    title: 'Moen',
+    subtitle: '',
+    category: 'Research & Design',
+    cardImg: 'assets/cards/moen.png',
+    tags: ['UX Research', 'Workflows', 'Voice UI'],
+    desc: 'Research and design work on voice-controlled experiences for Moen smart home products, resulting in a product named one of Better Homes & Gardens\' Top 30 Most Innovative Products.',
+    sections: [
+      {
+        id: 'overview', label: 'Overview', layout: 'full',
+        content: `Moen, a leader in kitchen and bath products, was expanding into the smart home space with a voice-controlled shower system. I led the UX research and design for the voice user interface (VUI) of the Moen Smart Shower — a connected shower system controllable via Alexa voice commands.\n\nThis project required developing deep expertise in voice interaction design, understanding the unique context of bathroom use, and designing for a fundamentally different input modality than traditional touch interfaces.`,
+      },
+      {
+        id: 'problem', label: 'The Problem', layout: 'highlight',
+        content: `Voice control in the bathroom presents unique design challenges. Users interact with the system while simultaneously performing other tasks — their hands may be wet, they may be reaching for towels, or they may be getting children ready for the day. Traditional app-based control was seen as cumbersome in this context.\n\nThe core design challenge was creating a voice experience that felt natural, reliable, and delightful — one that enhanced the shower experience rather than adding complexity to it.`,
+      },
+      {
+        id: 'contributions', label: 'My Contributions', layout: 'half-left', pairId: 'challenges',
+        content: `Led VUI research and design strategy.\n\nUser journey mapping.\n\nVoice interaction design and dialog flows.\n\nContextual user research in home environments.\n\nUsability testing of voice interaction prototypes.\n\nCollaboration with Alexa team at Amazon.`,
+      },
+      {
+        id: 'challenges', label: 'Challenges', layout: 'half-right', pairId: 'contributions',
+        content: `Designing for audio-only feedback in a noisy, wet environment.\n\nBalancing discoverability with simplicity of voice commands.\n\nAddressing privacy concerns around always-on microphones in bathrooms.\n\nDesigning error recovery flows for misrecognized voice commands.\n\nCoordinating across Moen hardware, software, and Amazon Alexa teams.`,
+      },
+      {
+        id: 'voicestudio', label: 'Voice Studio', layout: 'full',
+        content: `To develop an authentic understanding of voice interaction in the shower context, I established a "Voice Studio" research environment that simulated bathroom conditions — including ambient noise levels, steam, and the physical constraints of shower use.\n\nThis controlled environment allowed us to test voice command clarity, response timing, and error recovery in conditions that approximated real-world use without the logistical challenges of in-home testing. Key findings shaped the fundamental design principles for the Moen voice experience.`,
+        image: { caption: 'Voice Studio setup — simulating bathroom acoustic environment for VUI testing', src: 'assets/projects/moen/lab-setup.png', bg: '#eef2f5' },
+      },
+      {
+        id: 'documenting', label: 'Documenting Interfaces', layout: 'full',
+        content: `I developed a comprehensive documentation framework for the voice interface design, including conversation flow diagrams, sample dialog scripts, and error handling decision trees. This documentation served as both a design artifact and a development specification.\n\nThe documentation system established patterns for command recognition, confirmation responses, error messaging, and contextual help — creating a coherent voice experience across all supported use cases.`,
+        image: { caption: 'VUI documentation — conversation flows and dialog design specifications', src: 'assets/projects/moen/utterances.png', bg: '#f0f4f8' },
+      },
+      {
+        id: 'listen', label: 'Listen and Innovate', layout: 'full',
+        content: `User research revealed that voice interaction with smart home devices was still an emerging behavior for most consumers. Many users had Alexa devices but used them primarily for music and timers — the concept of controlling physical appliances was novel and sometimes intimidating.\n\nThis insight led to a design strategy focused on progressive disclosure — introducing voice control through simple, high-value commands that built user confidence, before revealing more advanced capabilities.`,
+      },
+      {
+        id: 'contextual', label: 'Contextual Information', layout: 'full',
+        content: `In-home contextual research with families using the Moen Smart Shower system in their actual bathrooms provided invaluable insights into real-world usage patterns. Observations revealed unexpected use cases — children using voice commands independently, users creating custom presets for family members — as well as friction points not captured in lab testing.\n\nThis contextual data led to several significant design refinements, particularly around family member personalization and the design of the "shower is ready" notification experience.`,
+        image: { caption: 'Contextual research — in-home observation of Smart Shower usage patterns', src: 'assets/projects/moen/interactions.png', bg: '#f2f5f8' },
+      },
+      {
+        id: 'prototyping', label: 'Prototyping', layout: 'full',
+        content: `I designed and tested multiple VUI prototypes using Wizard of Oz methodology — where a researcher manually triggered audio responses in real-time to simulate the voice system's behavior. This approach allowed rapid iteration on dialog flows and response timing without full system implementation.\n\nPrototype testing revealed critical insights about user expectations for response latency, confirmation verbosity, and error recovery — all of which were incorporated into the final Alexa skill design.`,
+        image: { caption: 'Wizard of Oz VUI prototype testing — iterating on dialog flows', src: 'assets/projects/moen/high-level-flows.png', bg: '#f0f3f8' },
+      },
+      {
+        id: 'architecture', label: 'About the Architecture', layout: 'full',
+        content: `The technical architecture of the Moen Smart Shower voice interface required careful coordination across three systems: the Moen Smart Shower hardware, the Amazon Alexa platform, and the Moen cloud backend. I worked closely with engineers from all three teams to ensure that the designed user experience was technically achievable within the constraints of each system.\n\nKey architectural decisions around command processing latency, offline fallback behavior, and multi-user profile management were directly influenced by user research findings about expectations and usage patterns.`,
+        image: { caption: 'System architecture diagram — Moen Smart Shower voice integration', src: 'assets/projects/moen/final-interaction-flows.png', bg: '#eef0f5' },
+      },
+      {
+        id: 'outcomes', label: 'Outcomes', layout: 'full',
+        content: `Moen Smart Shower VUI named one of Better Homes & Gardens' Top 30 Most Innovative Products.\n\nSuccessfully launched Alexa skill with voice control across full shower functionality.\n\nDeveloped comprehensive VUI design system and documentation framework.\n\nEstablished user research protocols for voice interface design adopted by Blink UX.\n\nDelivered in-home contextual research findings that shaped product roadmap for next generation.`,
+      },
+    ],
+  },
+  { id: 'gaming', title: 'Gaming', subtitle: '', category: 'Research', cardImg: 'assets/cards/gaming.png', tags: ['UX Research', 'Design Strategy', 'Personas'], desc: 'User research into gaming experiences, engagement patterns, and player emotion measurement.',
+    sections: [
+      { id: 'overview', label: 'Overview', layout: 'full',
+        content: `As part of a study into how people learn and engage with card games, I led user research designed to understand the emotional and cognitive dimensions of game learning. Using a combination of observational methods, facial expression capture, and structured interviews, I investigated how players experience frustration, engagement, and delight as they progress through learning a new game.\n\nThe research surfaced actionable insights about how game designers and UX practitioners can better support first-time players, reducing friction and increasing the likelihood of continued engagement.` },
+      { id: 'problem', label: 'The Problem', layout: 'highlight',
+        content: `Understanding player emotion during game learning is notoriously difficult. Self-report methods are unreliable — players often underreport frustration or struggle to articulate what they're feeling in the moment. Traditional usability testing approaches didn't capture the affective dimensions that are central to gaming experiences.\n\nThe research challenge was to develop a methodology that could capture authentic emotional responses in real time without disrupting the natural play experience.` },
+      { id: 'contributions', label: 'My Contributions', layout: 'half-left', pairId: 'challenges',
+        content: `Facilitation.\n\nUser research and design.\n\nLive information filtering.\n\nExperiments.\n\nInforming personas and other related research.` },
+      { id: 'challenges', label: 'Challenges', layout: 'half-right', pairId: 'contributions',
+        content: `Specific challenges related to emotional measurement.\n\nValidity in non-lab emotion capture.\n\nCreating controlled conditions without artificial environments.\n\nLinking emotional data to specific game moments.` },
+      { id: 'launching', label: 'Launching Into Study', layout: 'full',
+        content: `The research study was structured in three phases: pre-play orientation, observed play sessions, and post-play debrief interviews. Participants were recruited with no prior knowledge of the specific card game being studied, ensuring authentic first-time learning experiences.\n\nA key methodological innovation was the use of simultaneous facial expression capture alongside think-aloud protocols — allowing us to correlate self-reported experience with objectively measured affective signals at specific moments in the game learning arc.\n\nThe study tracked: engagement levels across learning stages, frustration triggers and recovery patterns, moments of delight and discovery, and the role of social facilitation in game learning.`,
+        image: { caption: 'Human and camera capturing smile — emotion detection during card game play', src: 'assets/projects/gaming/camera-setup.png', bg: '#f5f2e8' } },
+      { id: 'categorizing', label: 'Categorizing Emotional Responses', layout: 'full',
+        content: `Emotional responses were categorized using a validated affective framework adapted for gaming contexts. Facial expressions were mapped to five primary emotional states — Engaged, Frustrated, Confused, Amused, and Neutral — with inter-rater reliability established across two independent coders.\n\nCross-referencing emotional state data with game event logs revealed clear patterns: confusion peaks clustered around specific rule-learning moments, while amusement spikes correlated with unexpected game outcomes. These patterns provided actionable guidance for game designers seeking to calibrate difficulty curves and tutorial design.`,
+        image: { caption: 'Emotion categorization — smile-o-meter mapping across five affective states', src: 'assets/projects/gaming/smile-o-meter.png', bg: '#f8f5e8' } },
+      { id: 'results', label: 'Results', layout: 'full',
+        content: `The study findings revealed several significant patterns in how novice players experience card game learning:\n\nEngagement levels were highest in the first five minutes and after first successful round completion, with a notable dip during rule explanation phases.\n\nFrustration events were most frequent when players encountered rule exceptions, but recovery was rapid when facilitated by other players rather than written instructions.\n\nAmused emotional states were strongly correlated with unexpected victories and creative plays, suggesting that designing for "delightful surprises" is a key lever for engagement.\n\nThe findings informed specific design recommendations for game tutorial systems, rule presentation, and the facilitation of social learning dynamics in competitive card game contexts.`,
+        image: { caption: 'Results — emotional response frequency across game learning stages', src: 'assets/projects/gaming/enjoyment-levels.png', bg: '#f0f5f0' } },
+      { id: 'outcomes', label: 'Outcomes', layout: 'full',
+        content: `Developed validated methodology for real-time emotion capture in gaming research.\n\nIdentified key emotional inflection points in the card game learning arc.\n\nDelivered design recommendations adopted into game tutorial redesign.` },
+    ],
+  },
+  { id: 'bloodbanks', title: 'Blood Banks', subtitle: '', category: 'Research & Design', cardImg: 'assets/cards/blood-banks.png', tags: ['UX Research', 'UX Design', 'Healthcare'], desc: 'Research and design for blood bank operations, focusing on donor experience and process efficiency.',
+    sections: [
+      { id: 'overview', label: 'Overview', layout: 'full',
+        content: `Blood banking is a critical but often overlooked aspect of the healthcare system. I led research and design work focused on improving the operations of blood bank staff and the experience of blood donors throughout the donation process.\n\nThis project combined contextual inquiry with blood bank staff, observational research in donation centers, and participatory design sessions to identify opportunities for improving both the operational efficiency of blood bank workflows and the quality of the donor experience.` },
+      { id: 'problem', label: 'The Problem', layout: 'highlight',
+        content: `Blood banks face dual challenges: operational complexity on the staff side and a donor experience that is often clinical and uninviting. Donor retention is a persistent challenge — many first-time donors do not return for subsequent donations, representing a significant gap in blood supply sustainability.\n\nOn the operational side, staff relied on legacy software systems that created data silos, manual reconciliation tasks, and communication gaps between collection, processing, and distribution teams.` },
+      { id: 'contributions', label: 'My Contributions', layout: 'half-left', pairId: 'challenges',
+        content: `Stakeholder interviews and contextual research.\n\nWorkflow documentation and mapping.\n\nDonor journey mapping.\n\nUX design and prototyping.\n\nUsability testing sessions.` },
+      { id: 'challenges', label: 'Challenges', layout: 'half-right', pairId: 'contributions',
+        content: `Access to a regulated healthcare environment.\n\nPrivacy and compliance requirements.\n\nBalancing operational efficiency with donor experience.\ \ Diverse staff roles with conflicting workflow needs.` },
+      { id: 'concept', label: 'Connect', layout: 'full',
+        content: `Early research revealed that the biggest operational pain point was the disconnect between the donor-facing and staff-facing systems. Donors had no visibility into wait times, appointment status, or their donation history, while staff had to manually cross-reference multiple systems to manage donor flow.\n\nThe design concept centered on a unified platform connecting donor self-service touchpoints with staff operational dashboards — creating a shared data layer that would reduce manual reconciliation and give donors meaningful real-time information about their donation journey.`,
+        image: { caption: 'Connected system concept — donor and staff-facing interface integration', src: 'assets/projects/blood-banks/high-level-flow.png', bg: '#f0f5f8' } },
+      { id: 'refined', label: 'A Refined Vision', layout: 'full',
+        content: `Following initial concept testing, I refined the design vision through iterative workshops with blood bank staff and donor focus groups. The refined concept introduced a progressive disclosure model — presenting donors with a simple, reassuring interface while giving staff a richer operational view of the same underlying data.\n\nKey design innovations included a visual donor queue system for staff, a donor-facing appointment and history portal, and an inspection checklist interface that reduced manual documentation burden for collection staff.`,
+        image: { caption: 'Refined donor flow — from appointment booking through post-donation follow-up', src: 'assets/projects/blood-banks/concept.png', bg: '#f5f0f0' } },
+      { id: 'madeeasier', label: 'Made Easier', layout: 'full',
+        content: `The "Made Easier" phase focused on simplifying the highest-friction moments in both the donor and staff workflows. For donors, this meant redesigning the pre-donation health screening questionnaire as a guided, conversational interface rather than a clinical form.\n\nFor staff, the key improvement was an inspection and release interface that consolidated the multi-step product inspection process into a single streamlined view — reducing the time from collection to product release by an estimated 23%.`,
+        image: { caption: 'Donor screening app with integrated inspection interface', src: 'assets/projects/blood-banks/mobile.png', bg: '#f8f0f0', maxWidth: '65%' } },
+      { id: 'earlyproto', label: 'Early Prototyping', layout: 'full',
+        content: `Early prototypes of the staff-facing operations dashboard were developed and tested in a simulated blood bank environment with working staff. These sessions revealed critical requirements around data density preferences, alert prioritization, and the importance of at-a-glance status visibility for high-volume collection shifts.\n\nThe dark-mode dashboard design that emerged from these sessions prioritized ambient information display and minimized the cognitive load of switching between operational views during busy collection periods.`,
+        image: { caption: 'Staff operations dashboard — dark mode prototype for high-volume collection shifts', src: 'assets/projects/blood-banks/desktop.png', bg: '#2a3040' } },
+      { id: 'outcomes', label: 'Outcomes', layout: 'full',
+        content: `Developed unified donor and staff platform concept with validated interaction model.\n\nDonor journey map adopted as foundation for center redesign planning.\n\nEstimated 23% reduction in product release processing time from inspection interface redesign.\n\nDonor satisfaction prototype testing showed significant improvement in perceived wait time and communication clarity.` },
+    ],
+  },
+  { id: 'brainscience', title: 'Brain Science', subtitle: '', category: 'Research & Strategy', cardImg: 'assets/cards/brain-science.png', tags: ['UX Research', 'UX Design', 'Prototypes'], desc: 'Research and design work within the brain science domain, supporting complex scientific workflows.',
+    sections: [
+      { id: 'overview', label: 'Overview', layout: 'full',
+        content: `This project involved research and design work in support of neuroscience research workflows. I collaborated with researchers and clinicians to understand how complex brain science data is collected, analyzed, and communicated — and to identify opportunities for improving the tools and interfaces that support this work.\n\nThe project spanned multiple research phases including contextual inquiry with neuroscientists, co-design workshops, and prototype development for a brain science data visualization and research coordination platform.` },
+      { id: 'problem', label: 'The Problem', layout: 'highlight',
+        content: `Neuroscience researchers work with extraordinarily complex, multi-modal datasets — combining imaging data, behavioral measurements, genetic information, and clinical observations. The tools available to manage and analyze this data were fragmented, technically demanding, and poorly suited to collaborative research workflows.\n\nThe core challenge was designing interfaces that could make complex brain science data more accessible to researchers with varying levels of technical expertise, while preserving the depth and precision required by domain experts.` },
+      { id: 'contributions', label: 'My Contributions', layout: 'half-left', pairId: 'challenges',
+        content: `UX research and strategy.\n\nContextual inquiry with research teams.\n\nWorkflow mapping and gap analysis.\n\nDesign and prototyping.` },
+      { id: 'challenges', label: 'Challenges', layout: 'half-right', pairId: 'contributions',
+        content: `Highly specialized domain knowledge required.\n\nDiverse user base with varying technical needs.\n\nComplex information architecture.\n\nResearcher time constraints limiting availability for research.` },
+      { id: 'anatomy', label: 'Brain Anatomy', layout: 'full',
+        content: `To design effectively for neuroscience researchers, I developed a foundational understanding of brain anatomy and the key concepts that shape how researchers think about and navigate brain data. This domain immersion involved literature review, expert interviews, and participation in research team meetings.\n\nThis knowledge base was essential for designing navigation systems and data organization schemas that aligned with researchers' mental models — rather than imposing a generic information architecture on a highly specialized domain.`,
+        image: { caption: 'Brain anatomy reference framework — mapping research domains to visualization needs', src: 'assets/projects/brain-science/card-sort.png', bg: '#e8edf5' } },
+      { id: 'understanding', label: 'Understanding the Brain', layout: 'full',
+        content: `I developed a comprehensive workflow map of the neuroscience research process — from experimental design and data collection through analysis, interpretation, and publication. This map revealed critical coordination points where researchers needed better tools for sharing data, tracking experimental status, and communicating findings across distributed teams.\n\nKey insights included the significant time researchers spent on data format conversion and the lack of standardized protocols for sharing intermediate analysis results — both representing high-value design opportunities.`,
+        image: { caption: 'Research workflow map — neuroscience data collection through publication pipeline', src: 'assets/projects/brain-science/journey-map.png', bg: '#eef2f8' } },
+      { id: 'bringing', label: 'Bringing It Together', layout: 'full',
+        content: `The design synthesis phase brought together findings from contextual research, workflow mapping, and expert interviews into a unified set of design principles and opportunity areas. I developed a research platform concept that addressed the three highest-priority needs identified: unified data access, collaborative annotation, and streamlined publication workflows.\n\nPrototypes were developed at varying fidelity levels for each opportunity area and tested with researcher participants to validate design direction before committing to detailed specifications.`,
+        image: { caption: 'Prototype wireframes — unified research platform concept', src: 'assets/projects/brain-science/wireframe-prototype.png', bg: '#f0f4f8' } },
+      { id: 'sensemaking', label: 'Sense Making', layout: 'full',
+        content: `A key design challenge was supporting the sense-making process — helping researchers identify patterns and generate hypotheses from large, multi-dimensional datasets. I explored several design approaches for data visualization and interactive exploration, testing each with researcher participants to understand which visual representations best supported pattern recognition and hypothesis generation.\n\nThe winning approach combined a high-level overview visualization with progressive detail drill-down, allowing researchers to move fluidly between population-level patterns and individual specimen data.`,
+        image: { caption: 'Sense-making interface — layered visualization from population to individual level', src: 'assets/projects/brain-science/final-design.png', bg: '#f0f3f8' } },
+      { id: 'fieldstudy', label: 'Field Study', layout: 'full',
+        content: `A field study phase embedded me within a neuroscience research lab for an extended observation period. This immersive approach revealed workflow nuances that could not have been captured through interviews alone — including informal knowledge-sharing practices, the role of physical artifacts in the research process, and the significant cognitive overhead of managing data across multiple disconnected systems.\n\nField study observations directly informed several key design decisions in the final platform prototype, particularly around notification design and the integration of informal communication channels into the research coordination workflow.`,
+        image: { caption: 'Field study — embedded observation in active neuroscience research lab', src: 'assets/projects/brain-science/story-approach.png', bg: '#f5f0f5' } },
+      { id: 'outcomes', label: 'Outcomes', layout: 'full',
+        content: `Comprehensive neuroscience research workflow documentation.\n\nThree validated design concepts for research coordination platform.\n\nData visualization framework adopted for prototype development.\n\nResearch platform concept presented to funding stakeholders.\n\nField study findings published as internal design guidelines for scientific UX work.` },
+    ],
+  },
+  { id: 'realestate', title: 'Real Estate', subtitle: '', category: 'Research, Design & Strategy', cardImg: 'assets/cards/real-estate.png', tags: ['UX Research', 'UX Strategy', 'Design'], desc: 'End-to-end research, design, and strategy for a real estate property platform.',
+    sections: [
+      { id: 'overview', label: 'Overview', layout: 'full',
+        content: `I led research, design, and strategy for a real estate property platform aimed at improving how buyers, sellers, and agents navigate the complex process of residential real estate transactions. The project involved extensive user research with all three stakeholder groups, synthesis of findings into actionable design strategy, and development of a platform concept validated through iterative prototype testing.\n\nThe real estate market is characterized by high emotional stakes, complex information needs, and a multi-party transaction process that creates significant coordination challenges for all participants.` },
+      { id: 'problem', label: 'The Problem', layout: 'highlight',
+        content: `The residential real estate transaction process is fragmented across multiple platforms, documents, and intermediaries — creating significant friction and anxiety for buyers and sellers. Buyers struggle to reconcile property data from multiple sources, while sellers lack visibility into how their listings are performing and how agents are representing their interests.\n\nAgents, meanwhile, spend disproportionate time on administrative coordination tasks that detract from the relationship-focused work that drives their value.` },
+      { id: 'contributions', label: 'My Contributions', layout: 'half-left', pairId: 'challenges',
+        content: `Research planning and execution.\n\nStakeholder interviews across buyer, seller, and agent groups.\n\nSynthesis and insight development.\n\nDesign strategy and roadmap.\n\nHigh-fidelity prototype development.` },
+      { id: 'challenges', label: 'Challenges', layout: 'half-right', pairId: 'contributions',
+        content: `Recruiting participants across three distinct stakeholder groups.\n\nReconciling conflicting needs between buyers, sellers, and agents.\n\nNavigating regulatory complexity in real estate transaction design.\n\nDesigning for high-emotional-stakes decisions.` },
+      { id: 'synthesis', label: 'Synthesis', layout: 'full',
+        content: `Following an intensive research phase involving 34 interviews across buyer, seller, and agent stakeholder groups, I led a synthesis process designed to move from raw data to actionable insights. Affinity mapping sessions with the project team organized observations into themes, revealing the key tension points and opportunity areas across the transaction lifecycle.\n\nKey insight clusters included the significant emotional weight placed on agent trust and communication, the frustration of information asymmetry between parties, and the unmet need for progress transparency throughout the transaction process.`,
+        image: { caption: 'Affinity mapping synthesis — clustering insights across 34 stakeholder interviews', src: 'assets/projects/real-estate/remember-the-future.png', bg: '#f5f0e8' } },
+      { id: 'inventories', label: 'Inventories', layout: 'full',
+        content: `A competitive and comparative analysis phase catalogued the existing landscape of real estate platforms, identifying patterns in how current tools address — and fail to address — the needs identified in research. This inventory revealed significant white space in the area of transaction transparency and multi-party coordination tools.\n\nThe inventory findings helped focus the design strategy on differentiated opportunities rather than replicating features already well-served by existing platforms.` },
+      { id: 'studymeasures', label: 'Study Measures', layout: 'full',
+        content: `To ensure the platform concept could be objectively evaluated, I established a set of study measures tied to the core user needs identified in research. These measures — centered on perceived trust, transaction clarity, and coordination efficiency — served as evaluation criteria for prototype testing and design decision-making throughout the project.\n\nEstablishing these measures early in the process created alignment across the project team and client stakeholders around what success would look like for the platform.`,
+        image: { caption: 'Study measurement framework — transaction clarity and trust metrics', src: 'assets/projects/real-estate/wireflows.png', bg: '#f0f4f0' } },
+      { id: 'earlyproto', label: 'Early Prototyping', layout: 'full',
+        content: `Low and mid-fidelity prototypes were developed to test the core interaction concepts with research participants. Multiple rounds of testing explored different approaches to the property search experience, transaction status dashboard, and agent-client communication interface.\n\nEach round of testing produced specific, actionable design refinements. Most significantly, testing revealed that buyers wanted a unified "transaction hub" view — a single destination showing all parties, documents, milestones, and communications — rather than the tabbed structure used in initial prototypes.`,
+        image: { caption: 'Early prototypes — property search, transaction dashboard, and agent communication', src: 'assets/projects/real-estate/high-level-flow.png', bg: '#f0f5f2' } },
+      { id: 'refinedproto', label: 'Refined Prototypes', layout: 'full',
+        content: `High-fidelity prototypes incorporating findings from early testing were developed for the three core platform areas: property discovery, transaction management, and agent-client collaboration. These prototypes reflected a refined design language and interaction model validated through iterative testing.`,
+        image: { caption: 'High-fidelity prototypes — unified transaction hub and property discovery', src: 'assets/projects/real-estate/prototype.png', bg: '#f0f3f5' } },
+      { id: 'outcomes', label: 'Outcomes', layout: 'full',
+        content: `Comprehensive research across 34 buyer, seller, and agent participants.\n\nUnified design strategy addressing all three stakeholder groups.\n\nValidated high-fidelity platform prototype.\n\nTransaction hub concept adopted as the core product architecture.\n\nDesign strategy presented to investors as part of funding round materials.` },
+    ],
+  },
+  { id: 'trains', title: 'Trains', subtitle: '', category: 'Research & Design', cardImg: 'assets/cards/trains.png', tags: ['Design Strategy', 'UX Research', 'Heuristic Evaluation'], desc: 'Research and design for Positive Train Control — a federally mandated rail safety technology with complex operational workflows.',
+    sections: [
+      { id: 'overview', label: 'Overview', layout: 'full',
+        content: `Positive Train Control (PTC) is a federally mandated safety technology system required on all Class I railroads in the United States. I led research and design work to improve the user experience of PTC systems for locomotive engineers and dispatchers — the frontline operators responsible for managing train movements across the national rail network.\n\nThis project required deep domain immersion in a highly regulated, safety-critical environment, balancing federal compliance requirements with the very real human factors needs of operators working in demanding conditions.` },
+      { id: 'problem', label: 'The Problem', layout: 'highlight',
+        content: `Federal mandate required rapid deployment of PTC technology across the national rail network, but the systems deployed were designed primarily for technical compliance rather than operator usability. Locomotive engineers and dispatchers reported significant usability issues with PTC interfaces — issues that, in a safety-critical environment, carried real operational risk.\n\nThe challenge was to identify and address the most critical usability problems within the constraints of a federally regulated technical system, working within existing hardware and software limitations.` },
+      { id: 'contributions', label: 'My Contributions', layout: 'half-left', pairId: 'challenges',
+        content: `Stakeholder facilitation.\n\nContent audit.\n\nHeuristic evaluation.\n\nLiterature review.\n\nUsability sessions.` },
+      { id: 'challenges', label: 'Challenges', layout: 'half-right', pairId: 'contributions',
+        content: `Challenging access to PTC systems and operating environments.\n\nLimited user access to the live system for research.\n\nLive train UX safety requirements constraining testing approaches.\n\nUnderstanding complex UI within federal regulatory framework.` },
+      { id: 'framing', label: 'Framing the Problem', layout: 'full',
+        content: `The problem framing phase involved extensive literature review of PTC system documentation, federal mandate requirements, and existing human factors research in rail operations. This background research established a framework for understanding the relationship between system design constraints, regulatory requirements, and operator experience.\n\nI developed a stakeholder map and problem framing document that aligned the project team around the specific scope and goals of the UX intervention — distinguishing between issues that could be addressed through interface design and those requiring regulatory or infrastructure-level changes.` },
+      { id: 'connect', label: 'Connect', layout: 'full',
+        content: `A systems mapping exercise documented the full ecosystem of PTC technology — including the wayside sensors, onboard computers, dispatch systems, and back-office infrastructure that combine to create the PTC system experience. Understanding these system relationships was essential for identifying where UX improvements were technically feasible.`,
+        image: { caption: 'PTC system ecosystem map — connecting wayside, onboard, and dispatch components', src: 'assets/projects/trains/information-architecture.png', bg: '#eef2f5' } },
+      { id: 'wireframing', label: 'Wireframe Prototyping', layout: 'full',
+        content: `Wireframe prototypes were developed to explore improved interface concepts for the locomotive engineer PTC display. Working within the constraints of the existing hardware form factor, I designed alternative information layouts that improved the legibility of critical system status information and reduced the cognitive load of monitoring PTC status during active train operations.\n\nPrototypes were tested with locomotive engineers in a simulator environment, allowing evaluation of design concepts under realistic operational conditions without the safety constraints of live train testing.`,
+        image: { caption: 'PTC interface wireframes — redesigned status display for locomotive engineers', src: 'assets/projects/trains/wireframe.png', bg: '#f0f4f8' } },
+      { id: 'dispatching', label: 'Dispatcher Interface', layout: 'full',
+        content: `A parallel design track addressed the dispatcher interface — the control room system used by rail dispatchers to monitor and manage train movements across their territory. The dispatcher interface presented different challenges than the locomotive engineer display, prioritizing information density and multi-train status management over the single-train focus of the onboard system.\n\nPrototype testing with dispatchers revealed specific requirements around alert prioritization, geographic display integration, and the communication interface between dispatchers and locomotive engineers.`,
+        image: { caption: 'Dispatcher prototype — multi-train PTC status management interface', src: 'assets/projects/trains/prototype.png', bg: '#eef0f5' } },
+      { id: 'outcomes', label: 'Outcomes', layout: 'full',
+        content: `Comprehensive usability evaluation of deployed PTC systems across locomotive engineer and dispatcher roles.\n\nIdentified 38 priority usability issues with severity ratings and design recommendations.\n\nWireframe prototypes for improved locomotive engineer and dispatcher interfaces validated with operator participants.\n\nDesign recommendations delivered to PTC system vendor for implementation planning.\n\nHuman factors framework established for ongoing PTC system evaluation.` },
+    ],
+  },
+
+];
+
+
+/* ── HOME PAGE ── */
+function Tag({ label }) {
+  return (
+    <span style={{
+      fontFamily: "'Poppins', sans-serif", fontSize: 11, fontWeight: 500,
+      color: C.green, border: `1px solid ${C.greenLight}`,
+      borderRadius: 4, padding: '3px 9px', letterSpacing: '0.02em',
+    }}>{label}</span>
+  );
+}
+
+function ProjectCard({ project, onClick, delay }) {
+  const ref = useFadeIn(delay);
+  const [hov, setHov] = useState(false);
+  return (
+    <div ref={ref} className="fade-in"
+      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      onClick={onClick}
+      style={{
+        borderRadius: 16, border: `1px solid ${hov ? C.greenMuted : C.greenSubtle}`,
+        background: C.white, cursor: 'pointer',
+        transition: 'border-color 0.2s, transform 0.2s, box-shadow 0.2s',
+        transform: hov ? 'translateY(-2px)' : 'translateY(0)',
+        boxShadow: hov ? '0 8px 24px rgba(0,0,0,0.05)' : 'none',
+        display: 'flex', flexDirection: 'column',
+        padding: '28px 30px',
+      }}>
+      {/* Logo + title row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginBottom: 18 }}>
+        {project.cardImg && (
+          <img src={project.cardImg} alt={project.title}
+            style={{ width: 64, height: 64, objectFit: 'contain', flexShrink: 0 }} />
+        )}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 300, fontSize: 24, color: C.ink, lineHeight: 1.15, marginBottom: 5 }}>
+            {project.title}
+          </div>
+          <div style={{ fontFamily: "'Poppins', sans-serif", fontSize: 14, color: C.gray, lineHeight: 1.2 }}>
+            {project.category}
+          </div>
+        </div>
+      </div>
+      <p style={{ fontFamily: "'Open Sans', sans-serif", fontSize: 15, lineHeight: 1.7, color: C.ink, marginBottom: 20, flex: 1 }}>
+        {project.desc}
+      </p>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        {project.tags.map(t => <Tag key={t} label={t} />)}
+      </div>
+    </div>
+  );
+}
+
+
+
+function HomePage({ onProject }) {
+  const heroRef    = useFadeIn(60);
+  const taglineRef = useFadeIn(140);
+  const btnRef     = useFadeIn(220);
+  return (
+    <main className="home-main" style={{ paddingTop: 110, paddingBottom: 120, paddingLeft: 80, paddingRight: 80, maxWidth: 1200, margin: '0 auto' }}>
+
+      {/* Name + subtitle */}
+      <div ref={heroRef} className="fade-in" style={{ marginBottom: 20 }}>
+        <div className="hero-name" style={{
+          fontFamily: "'Poppins', sans-serif", fontWeight: 300, fontSize: 32,
+          color: C.ink, lineHeight: 1.15, marginBottom: 6,
+        }}>Jonathan Hilton Evans</div>
+        <div style={{
+          fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: 15, color: C.gray,
+          letterSpacing: '0.01em',
+        }}>UX Leader · Strategist · Designer · Researcher</div>
+      </div>
+
+      {/* Tagline */}
+      <div ref={taglineRef} className="fade-in" style={{ marginBottom: 32 }}>
+        <div className="hero-tagline" style={{
+          fontFamily: "'Poppins', sans-serif", fontWeight: 200, fontSize: 40,
+          color: C.ink, lineHeight: 1.2, maxWidth: 720,
+        }}>An experienced leader who drives creative, collaborative environments.</div>
+      </div>
+
+      {/* CTA button */}
+      <div ref={btnRef} className="fade-in" style={{ marginBottom: 80 }}>
+        <button onClick={() => onProject('gates')}
+          style={{
+            fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: 14,
+            color: C.white, background: C.green,
+            border: 'none', borderRadius: 6,
+            padding: '10px 20px',
+            cursor: 'pointer',
+            display: 'inline-flex', alignItems: 'center', gap: 10,
+            letterSpacing: '0.01em',
+          }}>
+          Explore My Portfolio <span style={{ fontSize: 16 }}>→</span>
+        </button>
+      </div>
+
+      <div id="project-grid" className="card-grid" style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, 1fr)',
+        gap: 20,
+      }}>
+        {PROJECTS.map((p, i) => (
+          <ProjectCard key={p.id} project={p} delay={i * 50} onClick={() => onProject(p.id)} />
+        ))}
+      </div>
+    </main>
+  );
+}
+
+/* ── CASE STUDY PAGE ── */
+function SectionHeader({ label }) {
+  return (
+    <div style={{
+      fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: 19,
+      color: C.ink, lineHeight: 1,
+      borderBottom: `1px solid ${C.greenMuted}`,
+      paddingBottom: 8, marginBottom: 14,
+    }}>{label}</div>
+  );
+}
+
+function BodyText({ children }) {
+  return (
+    <div style={{
+      fontFamily: "'Open Sans', sans-serif", fontSize: 15,
+      lineHeight: 1.75, color: C.ink, whiteSpace: 'pre-line',
+    }}>{children}</div>
+  );
+}
+
+function BulletList({ content }) {
+  const items = String(content).split(/\n\s*\n+/).map(s => s.trim()).filter(Boolean);
+  return (
+    <ul style={{
+      fontFamily: "'Open Sans', sans-serif", fontSize: 15,
+      lineHeight: 1.7, color: C.ink,
+      listStyle: 'none', padding: 0, margin: 0,
+      display: 'flex', flexDirection: 'column', gap: 10,
+    }}>
+      {items.map((item, i) => (
+        <li key={i} style={{ display: 'flex', gap: 14, alignItems: 'baseline' }}>
+          <span style={{ flex: '0 0 6px', height: 6, borderRadius: '50%', background: C.green, marginTop: 9, transform: 'translateY(-1px)' }} />
+          <span style={{ flex: 1 }}>{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/* In-page section nav — Poppins Medium 12px; active = muted green + dot */
+function SectionNav({ sections, activeId }) {
+  // Build display list: merge half-left + half-right into a single combined nav item
+  const navList = [];
+  const skipIds = new Set();
+  sections.forEach(sec => {
+    if (skipIds.has(sec.id)) return;
+    if (sec.layout === 'half-left' && sec.pairId) {
+      const pair = sections.find(s => s.id === sec.pairId);
+      if (pair) {
+        navList.push({ id: sec.id, pairId: pair.id, label: 'Contributions & Challenges' });
+        skipIds.add(pair.id);
+        return;
+      }
+    }
+    if (sec.layout === 'half-right') return; // safety: never show right half alone
+    navList.push({ id: sec.id, label: sec.label });
+  });
+  return (
+    <div style={{
+      position: 'sticky', top: 80,
+      alignSelf: 'flex-start',
+      display: 'flex', flexDirection: 'column', gap: 20,
+      minWidth: 130,
+    }}>
+      {navList.map(sec => {
+        const active = sec.id === activeId || sec.pairId === activeId;
+        return (
+          <a key={sec.id} href={`#section-${sec.id}`}
+            style={{
+              fontFamily: "'Poppins', sans-serif",
+              fontWeight: 500, fontSize: 12,
+              lineHeight: 1.3, letterSpacing: '0.01em',
+              color: active ? C.greenMuted : C.green,
+              textDecoration: 'none',
+              display: 'flex', alignItems: 'flex-start', gap: 6,
+            }}>
+            <span style={{ width: 5, height: 5, borderRadius: '50%', background: C.greenMuted, flexShrink: 0, marginTop: 4, opacity: active ? 1 : 0 }} />
+            <span>{sec.label}</span>
+          </a>
+        );
+      })}
+    </div>
+  );
+}
+
+function CaseStudyPage({ projectId, onBack, onProject }) {
+  const project = PROJECTS.find(p => p.id === projectId) || PROJECTS[0];
+  const projIdx = PROJECTS.findIndex(p => p.id === project.id);
+  const prevProj = projIdx > 0 ? PROJECTS[projIdx - 1] : PROJECTS[PROJECTS.length - 1];
+  const nextProj = projIdx < PROJECTS.length - 1 ? PROJECTS[projIdx + 1] : PROJECTS[0];
+  const [activeId, setActiveId] = useState(project.sections[0]?.id || '');
+  const anchorRefs = useRef({});
+
+  useEffect(() => {
+    setActiveId(project.sections[0]?.id || '');
+    window.scrollTo({ top: 0 });
+  }, [projectId]);
+
+  // Scroll-based active section tracking
+  useEffect(() => {
+    if (!project.sections.length) return;
+    const HEADER = 110;
+    function onScroll() {
+      const threshold = HEADER + 40;
+      let best = project.sections[0].id;
+      project.sections.forEach(sec => {
+        const el = anchorRefs.current[sec.id];
+        if (!el) return;
+        const top = el.getBoundingClientRect().top;
+        if (top <= threshold) best = sec.id;
+      });
+      setActiveId(best);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [projectId]);
+
+  if (!project.sections.length) {
+    return (
+      <main style={{ paddingTop: 110, paddingLeft: 100, paddingRight: 100, paddingBottom: 120 }}>
+        <div style={{ marginBottom: 32 }}>
+          <NavLink label="← Back" onClick={onBack} />
+        </div>
+        <div style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 200, fontSize: 52, color: C.ink }}>{project.title}</div>
+        <div style={{ fontFamily: "'Poppins', sans-serif", fontSize: 22, color: C.gray, marginTop: 10 }}>{project.category}</div>
+        <p style={{ fontFamily: "'Open Sans', sans-serif", fontSize: 15, color: C.gray, marginTop: 40, lineHeight: 1.7 }}>Full case study coming soon.</p>
+      </main>
+    );
+  }
+
+  const rendered = new Set();
+
+  return (
+    <main style={{ paddingTop: 96, paddingBottom: 120 }}>
+      <div style={{ paddingLeft: 100, paddingBottom: 32 }}>
+        <NavLink label="← Back" onClick={onBack} />
+      </div>
+      <div style={{ display: 'flex', gap: 60, paddingLeft: 100, paddingRight: 80, maxWidth: 1300 }}>
+
+        {/* Section nav */}
+        <div style={{ width: 130, flexShrink: 0 }}>
+          <SectionNav sections={project.sections} activeId={activeId} />
+        </div>
+
+        {/* Main card */}
+        <div style={{
+          flex: 1, maxWidth: 860,
+          borderRadius: 20, border: `1px solid ${C.greenSubtle}`,
+          background: C.white, padding: '40px 48px',
+        }}>
+          {/* Title block */}
+          {/* Title block */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginBottom: 48 }}>
+            {(project.cardImg || project.logo) && (
+              <img src={project.cardImg || project.logo} alt={project.title}
+                style={{ width: 100, height: 100, objectFit: 'contain', flexShrink: 0 }} />
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 200, fontSize: 48, color: C.ink, lineHeight: 1 }}>
+                {project.title}
+              </div>
+              <div style={{ fontFamily: "'Poppins', sans-serif", fontSize: 22, color: C.gray, lineHeight: 1 }}>
+                {project.category}
+              </div>
+            </div>
+          </div>
+
+          {/* Sections */}
+          {project.sections.map((sec) => {
+            if (rendered.has(sec.id)) return null;
+
+            if (sec.layout === 'full' || sec.layout === 'outcomes') {
+              rendered.add(sec.id);
+              return (
+                <div key={sec.id} id={`section-${sec.id}`} className="section-anchor"
+                  ref={el => anchorRefs.current[sec.id] = el} style={{ marginBottom: 48 }}>
+                  <SectionHeader label={sec.label} />
+                  {sec.id === 'outcomes' ? <BulletList content={sec.content} /> : <BodyText>{sec.content}</BodyText>}
+                  {sec.image && (
+                    <figure style={{ marginTop: 24 }}>
+                      <div style={{
+                        borderRadius: 10,
+                        background: sec.image.bg || 'rgb(247,249,246)',
+                        border: '1px solid rgb(233,237,234)',
+                        overflow: 'hidden',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        padding: sec.image.src ? 0 : 0,
+                        minHeight: sec.image.src ? 'auto' : 200,
+                      }}>
+                        {sec.image.src ? (
+                          <img src={sec.image.src} alt={sec.image.caption}
+                            style={{ display: 'block', width: sec.image.maxWidth || '100%', height: 'auto' }} />
+                        ) : (
+                          <span style={{ fontFamily: "'Poppins',sans-serif", fontSize: 13, color: 'rgb(158,158,158)', fontStyle: 'italic', padding: 24 }}>
+                            {sec.image.caption}
+                          </span>
+                        )}
+                      </div>
+                      {sec.image.src && (
+                        <figcaption style={{
+                          fontFamily: "'Open Sans',sans-serif", fontSize: 13,
+                          color: 'rgb(122,122,122)', fontStyle: 'italic',
+                          marginTop: 10, lineHeight: 1.55,
+                        }}>{sec.image.caption}</figcaption>
+                      )}
+                    </figure>
+                  )}
+                </div>
+              );
+            }
+
+            if (sec.layout === 'highlight') {
+              rendered.add(sec.id);
+              return (
+                <div key={sec.id} id={`section-${sec.id}`} className="section-anchor"
+                  ref={el => anchorRefs.current[sec.id] = el}
+                  style={{ borderRadius: 10, background: C.warmWhite, padding: '24px 28px', marginBottom: 48 }}>
+                  <SectionHeader label={sec.label} />
+                  <BodyText>{sec.content}</BodyText>
+                </div>
+              );
+            }
+
+            if (sec.layout === 'half-left') {
+              const pair = project.sections.find(s => s.id === sec.pairId);
+              rendered.add(sec.id);
+              if (pair) rendered.add(pair.id);
+              return (
+                <div key={sec.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 48 }}>
+                  <div id={`section-${sec.id}`} className="section-anchor"
+                    ref={el => anchorRefs.current[sec.id] = el}
+                    style={{ borderRadius: 10, border: `1px solid ${C.greenLight}`, padding: '24px 26px' }}>
+                    <SectionHeader label={sec.label} />
+                    <BodyText>{sec.content}</BodyText>
+                  </div>
+                  {pair && (
+                    <div id={`section-${pair.id}`} className="section-anchor"
+                      ref={el => anchorRefs.current[pair.id] = el}
+                      style={{ borderRadius: 10, border: `1px solid ${C.greenLight}`, padding: '24px 26px' }}>
+                      <SectionHeader label={pair.label} />
+                      <BodyText>{pair.content}</BodyText>
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            if (sec.layout === 'details') {
+              rendered.add(sec.id);
+              return (
+                <div key={sec.id} id={`section-${sec.id}`} className="section-anchor"
+                  ref={el => anchorRefs.current[sec.id] = el} style={{ marginBottom: 0 }}>
+                  {sec.subsections.map((sub, i) => (
+                    <div key={i} style={{ marginBottom: i < sec.subsections.length - 1 ? 40 : 0 }}>
+                      <SectionHeader label={sub.label} />
+                      <BodyText>{sub.content}</BodyText>
+                    </div>
+                  ))}
+                </div>
+              );
+            }
+
+            return null;
+          })}
+
+          {/* Prev / Next case study */}
+          <div style={{
+            marginTop: 56, paddingTop: 32,
+            borderTop: `1px solid ${C.greenSubtle}`,
+            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16,
+          }}>
+            <a className="prev-next-btn" onClick={() => { window.scrollTo({ top: 0 }); onProject(prevProj.id); }}
+              style={{
+                cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 14,
+                padding: '16px 20px',
+                borderRadius: 10, border: `1px solid ${C.greenLight}`,
+                textDecoration: 'none',
+              }}>
+              <span style={{ fontFamily: "'Poppins',sans-serif", fontSize: 18, color: C.green, lineHeight: 1 }}>←</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+                <span style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 500, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: C.gray }}>Previous</span>
+                <span style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 400, fontSize: 16, color: C.ink, lineHeight: 1.2 }}>{prevProj.title}</span>
+              </div>
+            </a>
+            <a className="prev-next-btn" onClick={() => { window.scrollTo({ top: 0 }); onProject(nextProj.id); }}
+              style={{
+                cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 14, justifyContent: 'flex-end',
+                padding: '16px 20px',
+                borderRadius: 10, border: `1px solid ${C.greenLight}`,
+                textDecoration: 'none', textAlign: 'right',
+              }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0, alignItems: 'flex-end' }}>
+                <span style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 500, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: C.gray }}>Next</span>
+                <span style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 400, fontSize: 16, color: C.ink, lineHeight: 1.2 }}>{nextProj.title}</span>
+              </div>
+              <span style={{ fontFamily: "'Poppins',sans-serif", fontSize: 18, color: C.green, lineHeight: 1 }}>→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      {/* bottom spacer so last section can scroll to top */}
+      <div style={{ height: '50vh' }} />
+    </main>
+  );
+}
+
+/* ── ABOUT PAGE ── */
+function AboutPage() {
+  const cardRef = useFadeIn(60);
+  return (
+    <main style={{ paddingTop: 110, paddingBottom: 120, paddingLeft: 80, paddingRight: 80, maxWidth: 1100, margin: '0 auto' }}>
+      <div ref={cardRef} className="fade-in" style={{
+        borderRadius: 20, border: `1px solid ${C.greenSubtle}`,
+        background: C.white, padding: '48px 56px',
+      }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'start' }} className="about-grid">
+          <div>
+            <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 500, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: C.gray, marginBottom: 18 }}>
+              Hello there.
+            </div>
+            <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 500, fontSize: 36, color: C.ink, lineHeight: 1.1, marginBottom: 28 }}>
+              I&apos;m Jonathan.
+            </div>
+            <p style={{ fontFamily: "'Open Sans',sans-serif", fontSize: 15, lineHeight: 1.75, color: C.gray, marginBottom: 18 }}>
+              This photo is quintessential me. I&apos;m with my silly/fun/amazing family, having just ridden around in a surrey with the fringe on top, wearing a Batman shirt.
+            </p>
+            <p style={{ fontFamily: "'Open Sans',sans-serif", fontSize: 15, lineHeight: 1.75, color: C.gray }}>
+              My professional story goes like this: I began to think about User Experiences back when my brother programmed the Apple IIe LOGO (turtle) to respond to a joystick back in the very early &lsquo;80s. Over the next couple of decades, I took my degree in Psychology from Swarthmore College and applied it to a career focused on the internet. Bouncing back and forth between design, research, and programming at places like CBS and Sony, I then combined my passions by getting an MS in Systems &amp; Information Engineering focused on Human Factors from the University of Virginia. From there, I settled down in the city I fell in love with, Seattle, and have been privileged to work as a Director of UX, Interactive Designer and User Researcher with companies such as Aperture.ai, Amazon, the Gates Foundation, Google, Microsoft, NASA, Nintendo, Pokemon and many more.
+            </p>
+          </div>
+          <div style={{
+            width: '100%', aspectRatio: '4 / 3', borderRadius: 12, overflow: 'hidden',
+            background: "url('assets/about-family.png') no-repeat",
+            backgroundSize: '210%',
+            backgroundPosition: '92% 14%',
+          }} aria-label="Jonathan with his family" />
+        </div>
+      </div>
+    </main>
+  );
+}
+
+/* ── RESUME PAGE ── */
+const R_sectionStyle = { borderBottom: `1px solid ${C.greenLight}`, paddingBottom: 24, marginBottom: 28 };
+const R_titleStyle   = { fontFamily: "'Poppins',sans-serif", fontWeight: 500, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: C.ink, marginBottom: 14 };
+const R_jobTitle     = { fontFamily: "'Poppins',sans-serif", fontWeight: 500, fontSize: 16, color: C.ink, lineHeight: 1.2 };
+const R_jobMeta      = { fontFamily: "'Poppins',sans-serif", fontWeight: 400, fontSize: 13, color: C.gray, whiteSpace: 'nowrap', marginLeft: 16 };
+const R_subheading   = { fontFamily: "'Poppins',sans-serif", fontWeight: 500, fontSize: 14, color: C.ink, marginTop: 14, marginBottom: 6 };
+
+function RBullet({ children }) {
+  return (
+    <div style={{ position: 'relative', paddingLeft: 18, marginBottom: 4 }}>
+      <span style={{ position: 'absolute', left: 0, top: '0.45em', width: 5, height: 5, borderRadius: '50%', background: C.greenMuted, display: 'inline-block' }} />
+      <span style={{ fontFamily: "'Open Sans',sans-serif", fontSize: 14, lineHeight: 1.65, color: C.ink }}>{children}</span>
+    </div>
+  );
+}
+
+function RJob({ title, dates, org, orgHref, groups }) {
+  return (
+    <div style={{ marginBottom: 28 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+        <div style={R_jobTitle}>{title}</div>
+        <div style={R_jobMeta}>{dates}</div>
+      </div>
+      <div style={{ marginBottom: 12 }}>
+        {orgHref
+          ? <a href={orgHref} target="_blank" rel="noopener" style={{ fontFamily: "'Poppins',sans-serif", fontSize: 14, color: C.green }}>{org}</a>
+          : <span style={{ fontFamily: "'Poppins',sans-serif", fontSize: 14, color: C.green }}>{org}</span>}
+      </div>
+      {groups.map((g, i) => (
+        <div key={i}>
+          <div style={R_subheading}>{g.heading}</div>
+          {g.bullets.map((b, j) => <RBullet key={j}>{b}</RBullet>)}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ResumePage() {
+  const heroRef = useFadeIn(60);
+  const bodyRef = useFadeIn(160);
+  return (
+    <main style={{ paddingTop: 110, paddingBottom: 120, paddingLeft: 100, paddingRight: 100, maxWidth: 960 }}>
+
+      {/* Name + contact header */}
+      <div ref={heroRef} className="fade-in" style={{
+        borderRadius: 20, border: `1px solid ${C.greenSubtle}`,
+        background: C.white, padding: '36px 48px', marginBottom: 32,
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 200, fontSize: 38, color: C.ink, lineHeight: 1, marginBottom: 12 }}>
+              Jonathan Hilton Evans
+            </div>
+            <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'center' }}>
+              {[
+                { text: 'Seattle, WA' },
+                { text: '206-491-8156' },
+                { text: 'jonathan@jonathan-evans.com', href: 'mailto:jonathan@jonathan-evans.com' },
+                { text: 'LinkedIn', href: 'https://www.linkedin.com/in/jonathanhevans/' },
+              ].map((item, i) => item.href
+                ? <a key={i} href={item.href} target="_blank" rel="noopener" style={{ fontFamily: "'Open Sans',sans-serif", fontSize: 14, color: C.green }}>{item.text}</a>
+                : <span key={i} style={{ fontFamily: "'Open Sans',sans-serif", fontSize: 14, color: C.gray }}>{item.text}</span>
+              )}
+            </div>
+          </div>
+          <a href="assets/resume.pdf" download title="Download PDF" style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: 36, height: 36, borderRadius: 8,
+            border: `1px solid ${C.greenLight}`, color: C.green, flexShrink: 0,
+          }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 1v9M5 7l3 3 3-3M2 12v1a1 1 0 001 1h10a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div ref={bodyRef} className="fade-in" style={{
+        borderRadius: 20, border: `1px solid ${C.greenSubtle}`,
+        background: C.white, padding: '40px 48px',
+      }}>
+
+        {/* Summary */}
+        <div style={R_sectionStyle}>
+          <div style={R_titleStyle}>Summary</div>
+          <div style={{ fontFamily: "'Open Sans',sans-serif", fontSize: 14, lineHeight: 1.7, color: C.ink }}>
+            UX Design & Research Leader with over 13 years experience building inclusive experiences across AI/ML, data-driven platforms, and enterprise software. Proven success scaling inclusive design practices, leading global research, and transforming complex systems into user-first interfaces. Recognized for bridging strategy with execution and driving measurable product impact through design. Seeking senior leadership roles where UX drives business growth.
+          </div>
+        </div>
+
+        {/* Core Competencies */}
+        <div style={R_sectionStyle}>
+          <div style={R_titleStyle}>Core Competencies & Technical Skills</div>
+          <div style={{ fontFamily: "'Open Sans',sans-serif", fontSize: 14, lineHeight: 1.8, color: C.ink }}>
+            UX Strategy | Product Design Leadership | AI/ML & Generative AI Design | Data Visualization | Enterprise SaaS | Inclusive Design & Accessibility (WCAG) | Agile Product Development | Journey Mapping | Design Systems | Voice UI | UX Research & Usability Testing
+          </div>
+          <div style={{ fontFamily: "'Open Sans',sans-serif", fontSize: 14, lineHeight: 1.8, color: C.ink, marginTop: 8 }}>
+            <strong>Tools:</strong> Figma | Adobe CC | Pendo | Dovetail | Jira | Notion | Miro | Mural | Microsoft Systems
+          </div>
+        </div>
+
+        {/* Work Experience */}
+        <div style={R_sectionStyle}>
+          <div style={R_titleStyle}>Work Experience</div>
+          <RJob title="UX Strategy Consultant / Principal UX Consultant" dates="Jan 2023 – Dec 2025"
+            org="The Gates Foundation (Allvus)" orgHref="https://www.gatesfoundation.org"
+            groups={[
+              { heading: 'AI-Driven UX Innovation & Knowledge Strategy', bullets: [
+                'Transformed the internal SharePoint-based search system into an AI-powered insight engine, reducing research time from 3 days to 3 hours.',
+                'Partnered with Head of Knowledge Management to align roadmap with user priorities and business goals using Mural.',
+              ]},
+              { heading: 'Global Research & Discovery', bullets: [
+                'Conducted 68 interviews across 5 global regions to define requirements for an enterprise investment portal.',
+                'Developed multi-user journey maps and capability models to guide platform design and roadmap using Figma.',
+              ]},
+              { heading: 'Inclusive Design & Accessibility Leadership', bullets: [
+                'Championed WCAG compliance via monthly inclusive design workshops, influencing org-wide design standards.',
+                'Launched continuous discovery loop using monthly usability testing and centralized research repository utilizing tools within the Microsoft Suite.',
+              ]},
+            ]} />
+          <RJob title="Director of UX & Product Design" dates="Jan 2020 – Aug 2022"
+            org="Aperture" orgHref={null}
+            groups={[
+              { heading: 'UX Strategy & Product Design Leadership', bullets: [
+                'Led UX for AI/ML analytics platform, aligning product strategy with user needs and market gaps.',
+                'Introduced agile UCD process, accelerating feature delivery by 31% without sacrificing usability.',
+              ]},
+              { heading: 'Design Culture & Team Building', bullets: [
+                'Built and mentored a cross-functional UX team (5 people); fostered design-driven culture within engineering org.',
+                'Modernized brand and digital presence, driving measurable increases in user engagement.',
+              ]},
+              { heading: 'C-Suite Strategic Influence', bullets: [
+                'Partnered directly with CEO and exec team to embed design thinking into company strategy.',
+                'Led cross-team collaboration forums that broke silos and accelerated solution delivery.',
+              ]},
+            ]} />
+          <RJob title="Principal UX Designer – B2B Platforms" dates="Jan 2012 – Oct 2019"
+            org="Blink UX" orgHref={null}
+            groups={[
+              { heading: 'Award-Winning Product Design', bullets: [
+                "Designed Moen's Smart Shower VUI—named one of Better Homes & Gardens' Top 30 Most Innovative Products.",
+                'Led UX for NASA DAACs, reducing data retrieval time by 67%, saving researchers over 10 hours weekly.',
+              ]},
+              { heading: 'Client Impact & Design Thinking Facilitation', bullets: [
+                'Facilitated workshops to define and launch enterprise software for real estate and nonprofit clients.',
+                'Used ethnography and journey mapping to modernize donor and scientific workflows.',
+              ]},
+              { heading: 'Internal Innovation & Promotion History', bullets: [
+                'Built agency-wide design system that cut asset retrieval time by 18.3%.',
+                'Fast-tracked from Interaction Designer → Senior → Principal based on leadership and client delivery.',
+              ]},
+            ]} />
+        </div>
+
+        {/* Education */}
+        <div style={R_sectionStyle}>
+          <div style={R_titleStyle}>Education</div>
+          <div style={{ marginBottom: 8 }}>
+            <span style={{ fontFamily: "'Open Sans',sans-serif", fontSize: 14, color: C.ink }}>M.S. Systems & Information Engineering — </span>
+            <a href="https://www.virginia.edu" target="_blank" rel="noopener" style={{ fontFamily: "'Open Sans',sans-serif", fontSize: 14, color: C.green }}>University of Virginia</a>
+          </div>
+          <div>
+            <span style={{ fontFamily: "'Open Sans',sans-serif", fontSize: 14, color: C.ink }}>B.A. Psychology — </span>
+            <a href="https://www.swarthmore.edu" target="_blank" rel="noopener" style={{ fontFamily: "'Open Sans',sans-serif", fontSize: 14, color: C.green }}>Swarthmore College</a>
+          </div>
+        </div>
+
+        {/* Patents */}
+        <div style={R_sectionStyle}>
+          <div style={R_titleStyle}>Patents</div>
+          <div style={{ fontFamily: "'Open Sans',sans-serif", fontSize: 14, lineHeight: 1.65, color: C.ink }}>
+            US Patent 11,762,916 B1 — <em>User Interface for Identifying Unmet Technical Needs and/or Technical Problems</em> (Granted September 19, 2023)
+          </div>
+        </div>
+
+        {/* Publications */}
+        <div style={{ ...R_sectionStyle, borderBottom: 'none', paddingBottom: 0, marginBottom: 0 }}>
+          <div style={R_titleStyle}>Publications & Speaking Engagements</div>
+          {[
+            { text: '"The UX of Showering with Alexa"', venue: 'Seattle Interactive Conference', href: 'https://www.seattleinteractive.com' },
+            { text: '"Infants: The terrifying danger of a UX edge case"', venue: 'Ignite Seattle', href: 'https://ignitseattle.com' },
+            { text: 'Featured writer at', venue: 'UX Matters', href: 'https://www.uxmatters.com' },
+          ].map((p, i) => (
+            <div key={i} style={{ fontFamily: "'Open Sans',sans-serif", fontSize: 14, color: C.ink, marginBottom: 6 }}>
+              {p.text} — <a href={p.href} target="_blank" rel="noopener" style={{ color: C.green }}>{p.venue}</a>
+            </div>
+          ))}
+        </div>
+
+      </div>
+    </main>
+  );
+}
+
+function SimplePage({ title }) {
+  const ref = useFadeIn(60);
+  return (
+    <main style={{ paddingTop: 130, paddingLeft: 100 }}>
+      <div ref={ref} className="fade-in" style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 200, fontSize: 52, color: C.ink }}>{title}</div>
+      <p style={{ fontFamily: "'Open Sans', sans-serif", fontSize: 15, color: C.gray, marginTop: 20 }}>Coming soon.</p>
+    </main>
+  );
+}
+
+/* ── ROOT ── */
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "gridColumns": 3,
+  "cardRadius": 16,
+  "heroSize": 56
+}/*EDITMODE-END*/;
+
+function App() {
+  const [screen, setScreen]     = useState(() => localStorage.getItem('je-v2-screen') || 'home');
+  const [tweaks, setTweaks]     = useState(TWEAK_DEFAULTS);
+  const [showTweaks, setShowTweaks] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('je-v2-screen', screen);
+    if (!screen.startsWith('project-')) window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [screen]);
+
+  useEffect(() => {
+    const handler = e => {
+      if (e.data?.type === '__activate_edit_mode')   setShowTweaks(true);
+      if (e.data?.type === '__deactivate_edit_mode') setShowTweaks(false);
+    };
+    window.addEventListener('message', handler);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', handler);
+  }, []);
+
+  function setTweak(k, v) {
+    const next = { ...tweaks, [k]: v };
+    setTweaks(next);
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [k]: v } }, '*');
+  }
+
+  return (
+    <div style={{ background: C.warmWhite, minHeight: '100vh' }}>
+      <Header screen={screen} onNav={dest => setScreen(dest)} />
+
+      {screen === 'home'    && <HomePage onProject={id => setScreen('project-' + id)} />}
+      {screen === 'about'   && <AboutPage />}
+      {screen === 'resume'  && <ResumePage />}
+      {screen.startsWith('project-') && (
+        <CaseStudyPage projectId={screen.replace('project-', '')} onBack={() => setScreen('home')} onProject={id => setScreen('project-' + id)} />
+      )}
+
+      {showTweaks && (
+        <div style={{
+          position: 'fixed', bottom: 24, right: 24, zIndex: 999,
+          background: C.white, border: `1px solid ${C.greenSubtle}`,
+          borderRadius: 12, padding: '20px 24px', minWidth: 240,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.10)',
+          fontFamily: "'Poppins', sans-serif",
+        }}>
+          <div style={{ fontSize: 13, fontWeight: 500, color: C.ink, marginBottom: 18, borderBottom: `1px solid ${C.greenSubtle}`, paddingBottom: 10 }}>Tweaks</div>
+          <label style={{ display: 'block', marginBottom: 14 }}>
+            <div style={{ fontSize: 11, color: C.gray, marginBottom: 6, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Grid columns — {tweaks.gridColumns}</div>
+            <input type="range" min={1} max={4} step={1} value={tweaks.gridColumns}
+              onChange={e => setTweak('gridColumns', Number(e.target.value))}
+              style={{ width: '100%', accentColor: C.green }} />
+          </label>
+          <label style={{ display: 'block', marginBottom: 14 }}>
+            <div style={{ fontSize: 11, color: C.gray, marginBottom: 6, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Card radius — {tweaks.cardRadius}px</div>
+            <input type="range" min={0} max={32} step={2} value={tweaks.cardRadius}
+              onChange={e => setTweak('cardRadius', Number(e.target.value))}
+              style={{ width: '100%', accentColor: C.green }} />
+          </label>
+          <label style={{ display: 'block' }}>
+            <div style={{ fontSize: 11, color: C.gray, marginBottom: 6, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hero size — {tweaks.heroSize}px</div>
+            <input type="range" min={36} max={80} step={2} value={tweaks.heroSize}
+              onChange={e => setTweak('heroSize', Number(e.target.value))}
+              style={{ width: '100%', accentColor: C.green }} />
+          </label>
+        </div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
