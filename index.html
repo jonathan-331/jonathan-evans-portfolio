@@ -61,10 +61,12 @@
   }
 
   /* Case study side nav hamburger */
+  .hamburger-wrap { display: none; }
   .section-nav-hamburger { display: none; }
   @media (max-width: 780px) {
     .section-nav-sidebar       { display: none !important; }
     .section-nav-sidebar-wrap  { display: none !important; }
+    .hamburger-wrap            { display: block; }
     .section-nav-hamburger     { display: block; }
     .case-study-inner { padding-left: 24px !important; padding-right: 24px !important; gap: 0 !important; }
     .case-study-back  { padding-left: 24px !important; }
@@ -988,7 +990,7 @@ function CaseStudyPage({ projectId, onBack, onProject }) {
         <NavLink label="← Back" onClick={onBack} />
       </div>
       {/* Hamburger — narrow screens only, sits above the card */}
-      <div className="case-study-back" style={{ paddingLeft: 32, paddingRight: 32, marginBottom: 16, position: 'sticky', top: 72, zIndex: 100 }}>
+      <div className="case-study-back hamburger-wrap" style={{ paddingLeft: 32, paddingRight: 32, marginBottom: 16, position: 'sticky', top: 72, zIndex: 100 }}>
         <SectionNav sections={project.sections} activeId={activeId} mobileOnly />
       </div>
 
@@ -1188,8 +1190,8 @@ function AboutPage() {
             </p>
           </div>
           <div className="about-img" style={{ width: '100%', borderRadius: 20, overflow: 'hidden', aspectRatio: '4 / 3' }}>
-            <img src="assets/about-family.png" alt="Jonathan with his family"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '92% 14%', display: 'block' }} />
+            <img src="https://cdn.prod.website-files.com/5d69a7906079d0f6bdbbbd14/5d8114a73510c96e1c062bc4_jonathanfamily.jpg" alt="Jonathan with his family"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
           </div>
         </div>
       </div>
