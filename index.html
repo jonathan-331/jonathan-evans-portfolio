@@ -52,7 +52,10 @@
   .prev-next-btn:hover, .prev-next-btn:hover * { text-decoration: none !important; }
 
   /* Mobile: reduce padding and font sizes across all pages */
+  /* Header */
+  .site-header { padding: 0 60px; }
   @media (max-width: 520px) {
+    .site-header { padding: 0 20px !important; }
     /* About page */
     .about-main  { padding-left: 20px !important; padding-right: 20px !important; }
     .about-card  { padding: 24px 20px !important; }
@@ -77,9 +80,10 @@
     .section-nav-sidebar-wrap  { display: none !important; }
     .hamburger-wrap            { display: block; }
     .section-nav-hamburger     { display: block; }
-    .case-study-inner { padding-left: 24px !important; padding-right: 24px !important; gap: 0 !important; }
-    .case-study-back  { padding-left: 24px !important; }
+    .case-study-back-link      { display: none !important; }
+    .case-study-inner { padding-left: 20px !important; padding-right: 20px !important; gap: 0 !important; }
   }
+  body { overflow-x: hidden; }
   .snav-dropdown {
     display: none;
     position: absolute;
@@ -191,9 +195,8 @@ function Header({ screen, onNav }) {
       height: 64, background: C.white,
       boxShadow: scrolled ? '0px 4px 4px 0px rgba(0,0,0,0.25)' : '0px 1px 0px 0px rgba(0,0,0,0.06)',
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '0 60px',
       transition: 'box-shadow 0.3s ease',
-    }}>
+    }} className="site-header">
       <img src="assets/logo-je.png" alt="J·E" onClick={() => onNav('home')}
         className="header-logo"
         style={{ height: 36, cursor: 'pointer', flexShrink: 0 }} />
@@ -995,7 +998,7 @@ function CaseStudyPage({ projectId, onBack, onProject }) {
 
   return (
     <main style={{ paddingTop: 96, paddingBottom: 120 }}>
-      <div className="case-study-back" style={{ paddingLeft: 100, paddingBottom: 32 }}>
+      <div className="case-study-back-link" style={{ paddingLeft: 100, paddingBottom: 32 }}>
         <NavLink label="← Back" onClick={onBack} />
       </div>
       {/* Hamburger — narrow screens only, sits above the card */}
