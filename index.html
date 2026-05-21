@@ -51,7 +51,20 @@
   .prev-next-btn:hover { background-color: rgb(246,248,245); }
   .prev-next-btn:hover, .prev-next-btn:hover * { text-decoration: none !important; }
 
-  /* About page: on narrow viewports, stop floating and stack image above text */
+  /* Mobile: reduce padding and font sizes across all pages */
+  @media (max-width: 520px) {
+    /* About page */
+    .about-main  { padding-left: 20px !important; padding-right: 20px !important; }
+    .about-card  { padding: 24px 20px !important; }
+    .about-name  { font-size: 26px !important; }
+    .about-img   { float: none !important; width: 100% !important; margin-left: 0 !important; margin-bottom: 24px !important; }
+    /* Resume page */
+    .resume-main { padding-left: 20px !important; padding-right: 20px !important; }
+    .resume-card { padding: 24px 20px !important; }
+    /* Header nav gap */
+    .header-nav  { gap: 20px !important; }
+  }
+  /* About image: stack below ~620px even without full mobile breakpoint */
   @media (max-width: 620px) {
     .about-img { float: none !important; width: 100% !important; margin-left: 0 !important; margin-bottom: 28px !important; }
   }
@@ -184,7 +197,7 @@ function Header({ screen, onNav }) {
       <img src="assets/logo-je.png" alt="J·E" onClick={() => onNav('home')}
         className="header-logo"
         style={{ height: 36, cursor: 'pointer', flexShrink: 0 }} />
-      <nav style={{ display: 'flex', gap: 40, alignItems: 'center', marginLeft: 'auto' }}>
+      <nav className="header-nav" style={{ display: 'flex', gap: 40, alignItems: 'center', marginLeft: 'auto' }}>
         {navItems.map(item => (
           <NavLink
             key={item.label}
@@ -1165,8 +1178,8 @@ function CaseStudyPage({ projectId, onBack, onProject }) {
 function AboutPage() {
   const cardRef = useFadeIn(60);
   return (
-    <main style={{ paddingTop: 110, paddingBottom: 120, paddingLeft: 80, paddingRight: 80, maxWidth: 1100, margin: '0 auto' }}>
-      <div ref={cardRef} className="fade-in" style={{
+    <main className="about-main" style={{ paddingTop: 110, paddingBottom: 120, paddingLeft: 80, paddingRight: 80, maxWidth: 1100, margin: '0 auto' }}>
+      <div ref={cardRef} className="fade-in about-card" style={{
         borderRadius: 20, border: `1px solid ${C.greenSubtle}`,
         background: C.white, padding: '48px 56px',
       }}>
@@ -1178,7 +1191,7 @@ function AboutPage() {
           <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 500, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: C.gray, marginBottom: 18 }}>
             Hello there.
           </div>
-          <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 500, fontSize: 36, color: C.ink, lineHeight: 1.1, marginBottom: 28, whiteSpace: 'nowrap' }}>
+          <div className="about-name" style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 500, fontSize: 36, color: C.ink, lineHeight: 1.1, marginBottom: 28, whiteSpace: 'nowrap' }}>
             I&apos;m Jonathan.
           </div>
           <p style={{ fontFamily: "'Open Sans',sans-serif", fontSize: 15, lineHeight: 1.75, color: C.gray, marginBottom: 18 }}>
@@ -1235,10 +1248,10 @@ function ResumePage() {
   const heroRef = useFadeIn(60);
   const bodyRef = useFadeIn(160);
   return (
-    <main style={{ paddingTop: 110, paddingBottom: 120, paddingLeft: 100, paddingRight: 100, maxWidth: 960 }}>
+    <main className="resume-main" style={{ paddingTop: 110, paddingBottom: 120, paddingLeft: 100, paddingRight: 100, maxWidth: 960 }}>
 
       {/* Name + contact header */}
-      <div ref={heroRef} className="fade-in" style={{
+      <div ref={heroRef} className="fade-in resume-card" style={{
         borderRadius: 20, border: `1px solid ${C.greenSubtle}`,
         background: C.white, padding: '36px 48px', marginBottom: 32,
       }}>
@@ -1272,7 +1285,7 @@ function ResumePage() {
       </div>
 
       {/* Body */}
-      <div ref={bodyRef} className="fade-in" style={{
+      <div ref={bodyRef} className="fade-in resume-card" style={{
         borderRadius: 20, border: `1px solid ${C.greenSubtle}`,
         background: C.white, padding: '40px 48px',
       }}>
