@@ -51,13 +51,9 @@
   .prev-next-btn:hover { background-color: rgb(246,248,245); }
   .prev-next-btn:hover, .prev-next-btn:hover * { text-decoration: none !important; }
 
-  /* About page: stack image above text on narrow viewports */
-  @media (max-width: 720px) {
-    .about-grid {
-      grid-template-columns: 1fr !important;
-    }
-    .about-grid > div:first-child { order: 2; }
-    .about-img { order: 1; width: 100% !important; }
+  /* About page: on narrow viewports, stop floating and stack image above text */
+  @media (max-width: 620px) {
+    .about-img { float: none !important; width: 100% !important; margin-left: 0 !important; margin-bottom: 28px !important; }
   }
 
   /* Case study side nav hamburger */
@@ -1174,25 +1170,23 @@ function AboutPage() {
         borderRadius: 20, border: `1px solid ${C.greenSubtle}`,
         background: C.white, padding: '48px 56px',
       }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'start' }} className="about-grid">
-          <div>
-            <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 500, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: C.gray, marginBottom: 18 }}>
-              Hello there.
-            </div>
-            <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 500, fontSize: 36, color: C.ink, lineHeight: 1.1, marginBottom: 28 }}>
-              I&apos;m Jonathan.
-            </div>
-            <p style={{ fontFamily: "'Open Sans',sans-serif", fontSize: 15, lineHeight: 1.75, color: C.gray, marginBottom: 18 }}>
-              This photo is quintessential me. I&apos;m with my silly/fun/amazing family, having just ridden around in a surrey with the fringe on top, wearing a Batman shirt.
-            </p>
-            <p style={{ fontFamily: "'Open Sans',sans-serif", fontSize: 15, lineHeight: 1.75, color: C.gray }}>
-              My professional story goes like this: I began to think about User Experiences back when my brother programmed the Apple IIe LOGO (turtle) to respond to a joystick back in the very early &lsquo;80s. Over the next couple of decades, I took my degree in Psychology from Swarthmore College and applied it to a career focused on the internet. Bouncing back and forth between design, research, and programming at places like CBS and Sony, I then combined my passions by getting an MS in Systems &amp; Information Engineering focused on Human Factors from the University of Virginia. From there, I settled down in the city I fell in love with, Seattle, and have been privileged to work as a Director of UX, Interactive Designer and User Researcher with companies such as Aperture.ai, Amazon, the Gates Foundation, Google, Microsoft, NASA, Nintendo, Pokemon and many more.
-            </p>
-          </div>
-          <div className="about-img" style={{ width: '100%', borderRadius: 20, overflow: 'hidden', aspectRatio: '4 / 3' }}>
+        <div style={{ overflow: 'hidden' }}>
+          <div className="about-img" style={{ float: 'right', width: '45%', marginLeft: 40, marginBottom: 24, borderRadius: 20, overflow: 'hidden', aspectRatio: '4 / 3' }}>
             <img src="assets/about-family.jpg" alt="Jonathan with his family"
               style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
           </div>
+          <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 500, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: C.gray, marginBottom: 18 }}>
+            Hello there.
+          </div>
+          <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 500, fontSize: 36, color: C.ink, lineHeight: 1.1, marginBottom: 28 }}>
+            I&apos;m Jonathan.
+          </div>
+          <p style={{ fontFamily: "'Open Sans',sans-serif", fontSize: 15, lineHeight: 1.75, color: C.gray, marginBottom: 18 }}>
+            This photo is quintessential me. I&apos;m with my silly/fun/amazing family, having just ridden around in a surrey with the fringe on top, wearing a Batman shirt.
+          </p>
+          <p style={{ fontFamily: "'Open Sans',sans-serif", fontSize: 15, lineHeight: 1.75, color: C.gray }}>
+            My professional story goes like this: I began to think about User Experiences back when my brother programmed the Apple IIe LOGO (turtle) to respond to a joystick back in the very early &lsquo;80s. Over the next couple of decades, I took my degree in Psychology from Swarthmore College and applied it to a career focused on the internet. Bouncing back and forth between design, research, and programming at places like CBS and Sony, I then combined my passions by getting an MS in Systems &amp; Information Engineering focused on Human Factors from the University of Virginia. From there, I settled down in the city I fell in love with, Seattle, and have been privileged to work as a Director of UX, Interactive Designer and User Researcher with companies such as Aperture.ai, Amazon, the Gates Foundation, Google, Microsoft, NASA, Nintendo, Pokemon and many more.
+          </p>
         </div>
       </div>
     </main>
