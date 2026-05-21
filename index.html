@@ -892,7 +892,6 @@ function SectionNav({ sections, activeId, mobileOnly = false, desktopOnly = fals
 
   if (desktopOnly) return (
     <div className="section-nav-sidebar" style={{
-      position: 'sticky', top: 80, alignSelf: 'flex-start',
       display: 'flex', flexDirection: 'column', gap: 20, minWidth: 130,
     }}>
       {navLinks}
@@ -1011,7 +1010,7 @@ function CaseStudyPage({ projectId, onBack, onProject }) {
       <div className="case-study-inner" style={{ display: 'flex', gap: 60, paddingLeft: 100, paddingRight: 80, maxWidth: 1300 }}>
 
         {/* Sidebar nav — wrapper + inner both hidden on narrow screens */}
-        <div className="section-nav-sidebar-wrap" style={{ width: 130, flexShrink: 0 }}>
+        <div className="section-nav-sidebar-wrap" style={{ width: 130, flexShrink: 0, alignSelf: 'flex-start', position: 'sticky', top: 80 }}>
           <SectionNav sections={project.sections} activeId={activeId} desktopOnly />
         </div>
 
