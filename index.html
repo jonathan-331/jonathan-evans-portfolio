@@ -80,10 +80,10 @@
     .section-nav-sidebar-wrap  { display: none !important; }
     .hamburger-wrap            { display: block; }
     .section-nav-hamburger     { display: block; }
-    .case-study-back-link      { display: none !important; }
     .case-study-inner { padding-left: 20px !important; padding-right: 20px !important; gap: 0 !important; }
+    .case-study-card  { padding: 24px 20px !important; }
   }
-  body { overflow-x: hidden; }
+  html, body { overflow-x: hidden; }
   .snav-dropdown {
     display: none;
     position: absolute;
@@ -998,7 +998,7 @@ function CaseStudyPage({ projectId, onBack, onProject }) {
 
   return (
     <main style={{ paddingTop: 96, paddingBottom: 120 }}>
-      <div className="case-study-back-link" style={{ paddingLeft: 100, paddingBottom: 32 }}>
+      <div className="case-study-back-link case-study-back" style={{ paddingLeft: 100, paddingBottom: 32 }}>
         <NavLink label="← Back" onClick={onBack} />
       </div>
       {/* Hamburger — narrow screens only, sits above the card */}
@@ -1014,8 +1014,8 @@ function CaseStudyPage({ projectId, onBack, onProject }) {
         </div>
 
         {/* Main card */}
-        <div style={{
-          flex: 1, maxWidth: 860,
+        <div className="case-study-card" style={{
+          flex: 1, minWidth: 0, maxWidth: 860,
           borderRadius: 20, border: `1px solid ${C.greenSubtle}`,
           background: C.white, padding: '40px 48px',
         }}>
