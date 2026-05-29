@@ -704,16 +704,37 @@ const PROJECTS = [
         content: `In order to understand how the site was being used, we needed to understand the user journey. We began the project with a workshop that gave us insight into the users. We used this as the basis for a series of user interviews, where we captured their workflow.`,
         image: { caption: 'JOURNEY MAP: Compilation of findings from the first round of user research.', src: 'assets/projects/brain-science/journey-map.png', bg: '#eef2f8' } },
       { id: 'ia', label: 'Testing the Information Architecture', layout: 'full',
-        content: `We had an understanding of the user interactions, but we needed to establish a navigation pattern. After working with the stakeholders to determine a new information architecture, we wanted to see how the users wanted to navigate the site. We did this by recruiting users from across the US, and a few in Europe, performed moderated remote research, included card sort of main areas of the site, and tested information architecture in megamenu navigation format.`,
+        contentParts: [
+          { type: 'text', value: `We had an understanding of the user interactions, but we needed to establish a navigation pattern. After working with the stakeholders to determine a new information architecture, we wanted to see how the users wanted to navigate the site. We did this by:` },
+          { type: 'bullets', items: [
+            'Recruiting users from across the US, and a few in Europe',
+            'Performed moderated remote research',
+            'Included card sort of main areas of the site',
+            'Tested information architecture in megamenu navigation format',
+          ]},
+        ],
         image: { caption: 'WIREFRAME PROTOTYPE: Example of megamenu presented to users.', src: 'assets/projects/brain-science/wireframe-prototype.png', bg: '#f0f4f8' } },
       { id: 'navdirection', label: 'Navigation Direction', layout: 'full',
-        content: `The results of the second round of research showed that users had clear expectations about how the site should be organized. This included a clear distinction between science, administration, and engineering options, desiring a way to navigate to information about different genes and brain sections, and clear terminology for science topics.\n\nIn addition to the navigation groupings, we also tested navigation methods. We found that users wanted longer pages with more information, without any alternate navigation methods for condensing information.`,
+        contentParts: [
+          { type: 'text', value: `The results of the second round of research showed that users had clear expectations about how the site should be organized. This included:` },
+          { type: 'bullets', items: [
+            'A clear distinction between science, administration, and engineering options',
+            'Desiring a way to navigate to information about different genes and brain sections',
+            'Clear terminology for science topics',
+          ]},
+        ],
         images: [
           { caption: 'CARD SORT RESULTS: Part of a dendrogram indicating the desired groupings.', src: 'assets/projects/brain-science/card-sort.png', bg: '#e8edf5' },
           { caption: 'SCROLLING TOPICS: Participants were adamant about not wanting to have to scroll through the science topics.', src: 'assets/projects/brain-science/scrolling-topics.png', bg: '#eef2f8' },
         ] },
       { id: 'twoapproaches', label: 'Two Approaches', layout: 'full',
-        content: `After the user research, we presented two approaches to content on the pages. These included a Story approach, where all of the pages tell a story of the data, and a Utility approach, where users can find the pieces of data leading to further detail.\n\nAfter discussions, we decided that the story approach was not right for these users. These scientists wanted to get to the desired data detail as quickly as possible, and were not interested in the story of the data.`,
+        contentParts: [
+          { type: 'text', value: `After the user research, we presented two approaches to content on the pages. These included:` },
+          { type: 'bullets', items: [
+            'Story approach, where all of the pages tell a story of the data',
+            'Utility approach, where users can find the pieces of data leading to further detail',
+          ]},
+        ],
         images: [
           { caption: 'UTILITY APPROACH: Scrolling the page finds additional data or topics.', src: 'assets/projects/brain-science/utility-approach.png', bg: '#f0f5f0' },
           { caption: 'STORY APPROACH: Scrolling the page tells a story about the presented data or topic, allowing the user the option to explore more.', src: 'assets/projects/brain-science/story-approach.png', bg: '#f5f0f5' },
@@ -722,7 +743,15 @@ const PROJECTS = [
         content: `I worked closely on the final design with a skilled visual designer. He was inspired by artwork seen at the client location, which led to the final design. The color scheme was innocuous enough to be used on top of other tools, but the pattern reflected brain cell imagery artwork.`,
         image: { caption: 'FINAL DESIGN: This was the main designed page from the final deliverable.', src: 'assets/projects/brain-science/final-design.png', bg: '#f0f3f8' } },
       { id: 'outcomes', label: 'Outcomes', layout: 'full',
-        content: `This project was considered a success because the client launched the site according to our proposed design language, the proposed navigation was adopted, and they gave a high Net Promoter Score.` },
+        contentParts: [
+          { type: 'text', value: `This project was considered a success because the client:` },
+          { type: 'bullets', items: [
+            'Launched the site according to our proposed design language',
+            'The proposed navigation was adopted',
+            'Gave a high Net Promoter Score',
+          ]},
+        ],
+      },
     ],
   },
   { id: 'realestate', title: 'Real Estate', subtitle: '', category: 'Research, Design & Strategy', cardImg: 'assets/cards/real-estate.png', tags: ['UX Research', 'UX Strategy', 'Design'], desc: 'Drove the product evolution of a comprehensive real estate property platform, transforming fragmented user journeys into a focused experience.',
