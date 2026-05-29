@@ -469,7 +469,10 @@ const PROJECTS = [
       },
       {
         id: 'outofroom', label: 'Out of the Room Thinking', layout: 'full',
-        content: `To ensure that we explored a diverse range of design possibilities and avoided premature consensus, we implemented a technique to encourage divergent thinking and prevent groupthink. We did this by providing each designer with the same design challenge and instructing them to independently brainstorm and sketch unique design solutions, facilitating a group discussion where designers presented their sketches, shared their thought processes, and provided constructive feedback, and identifying the most promising design concepts that revised our overall design direction.`,
+        contentParts: [
+          { type: 'text', value: `To ensure that we explored a diverse range of design possibilities and avoided premature consensus, we implemented a technique to encourage divergent thinking and prevent groupthink. We did this by:` },
+          { type: 'bullets', items: ['Providing each designer with the same design challenge and instructing them to independently brainstorm and sketch unique design solutions', 'Facilitating a group discussion where designers presented their sketches, shared their thought processes, and provided constructive feedback', 'Identifying the most promising design concepts that revised our overall design direction, ensuring that the final solution was innovative, user-centered, and aligned with the client\'s vision.'] },
+        ],
         image: { caption: 'CONCEPT CARDS: These demonstrated some design thinking we identified in a brainstorm exercise.', src: 'assets/projects/power-plants/concept-cards.png', bg: '#eef0f5' },
       },
       {
@@ -499,8 +502,15 @@ const PROJECTS = [
       },
       {
         id: 'outcomes', label: 'Outcomes', layout: 'full',
-        content: `This project was considered successful because the project's design direction was successfully implemented to some degree, indicating that the proposed solutions were viable and effective. The client's decision to continue the work demonstrated satisfaction with the initial outcomes and a desire to further collaborate on improving the system. The client also reported that users were happy with the design direction.`,
-      },
+        contentParts: [
+          { type: 'text', value: `This project was considered successful because:` },
+          { type: 'bullets', items: [
+            '<b>Successful Implementation:</b> The project\'s design direction was successfully implemented to some degree, indicating that the proposed solutions were viable and effective.',
+            '<b>Continued Engagement:</b> The client\'s decision to continue the work is a strong indicator of project success. It demonstrates client satisfaction with the initial outcomes and a desire to further collaborate on improving the system.',
+            '<b>User Satisfaction:</b> The client reported that users were happy with the design direction.',
+          ]},
+        ],
+        },
     ],
   },
   {
