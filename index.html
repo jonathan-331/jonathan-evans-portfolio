@@ -1197,14 +1197,14 @@ function CaseStudyPage({ projectId, onBack, onProject }) {
                     ref={el => anchorRefs.current[sec.id] = el}
                     style={{ borderRadius: 10, border: `1px solid ${C.greenLight}`, padding: '24px 26px' }}>
                     <SectionHeader label={sec.label} />
-                    <BodyText>{sec.content}</BodyText>
+                    <BulletList content={sec.content} />
                   </div>
                   {pair && (
                     <div id={`section-${pair.id}`} className="section-anchor"
                       ref={el => anchorRefs.current[pair.id] = el}
                       style={{ borderRadius: 10, border: `1px solid ${C.greenLight}`, padding: '24px 26px' }}>
                       <SectionHeader label={pair.label} />
-                      <BodyText>{pair.content}</BodyText>
+                      <BulletList content={pair.content} />
                     </div>
                   )}
                 </div>
