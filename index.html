@@ -385,12 +385,19 @@ const PROJECTS = [
       },
       {
         id: 'retrieving', label: 'Retrieving Data', layout: 'full',
-        content: `To observe scientists' interactions with the DAACs, we conducted think-aloud protocols, where participants verbalized their thoughts and actions as they attempted to retrieve sample datasets. Scientists were asked to retrieve data from:\n\nTheir primary DAAC\n\nA data-relevant secondary DAAC with which they had less experience\n\nThis comparative approach allowed us to identify key differences in user experience across different DAACs.\n\nOur findings revealed that while scientists were generally able to find and download data from their primary DAACs, they encountered significant challenges when navigating unfamiliar DAACs. These challenges included difficulty in locating relevant datasets, understanding data formats and documentation, and navigating the websites. These findings highlighted the need for improved user onboarding, standardized interfaces across DAACs, and more comprehensive and user-friendly documentation to enhance data access and utilization.`,
+        contentParts: [
+          { type: 'text', value: `To observe scientists' interactions with the DAACs, we conducted think-aloud protocols, where participants verbalized their thoughts and actions as they attempted to retrieve sample datasets. Scientists were asked to retrieve data from:` },
+          { type: 'bullets', items: ['Their primary DAAC', 'A data-relevant secondary DAAC with which they had less experience'] },
+          { type: 'text', value: `This comparative approach allowed us to identify key differences in user experience across different DAACs.\n\nOur findings revealed that while scientists were generally able to find and download data from their primary DAACs, they encountered significant challenges when navigating unfamiliar DAACs. These challenges included difficulty in locating relevant datasets, understanding data formats and documentation, and navigating the websites. These findings highlighted the need for improved user onboarding, standardized interfaces across DAACs, and more comprehensive and user-friendly documentation to enhance data access and utilization.` },
+        ],
         image: { caption: "RESULTS TABLE: This table displays the successes the participants had for the different DAACs. 'Primary' indicates it's a DAAC they used regularly. 'Secondary' indicates it's a DAAC they did not use regularly.", src: 'assets/projects/nasa/results-table.png', bg: '#f0f4ea' },
       },
       {
         id: 'workflows', label: 'Capturing Workflows', layout: 'full',
-        content: `To understand the intricacies of scientist workflows, we utilized a combination of methods, including semi-structured interviews, task-based scenarios, and a co-creation exercise. Collaborating closely with each participant, we:\n\nDiscussed their workflows to understand context\n\nBuilt a visual representation of their workflows on Keynote slides\n\nCaptured high-level steps of their workflows, then drilled down into details such as tools and pain points`,
+        contentParts: [
+          { type: 'text', value: `To understand the intricacies of scientist workflows, we utilized a combination of methods, including semi-structured interviews, task-based scenarios, and a co-creation exercise. Collaborating closely with each participant, we:` },
+          { type: 'bullets', items: ['Discussed their workflows to understand context', 'Built a visual representation of their workflows on Keynote slides', 'Captured high-level steps of their workflows, then drilled down into details such as tools and pain points'] },
+        ],
         image: { caption: "CO-CREATION EXERCISE: This is an example of a participant's process created in the session to find and use data for a research question.", src: 'assets/projects/nasa/cocreation.png', bg: '#f0f4e8' },
       },
       {
@@ -408,7 +415,15 @@ const PROJECTS = [
       },
       {
         id: 'outcomes', label: 'Outcomes', layout: 'full',
-        content: `This project was considered a great success. This was determined by:\n\nSeeing our design recommendations implemented on multiple DAACs\n\nReceiving positive feedback from NASA and DAAC stakeholders, with many expressing appreciation for the valuable insights\n\nBeing recognized as a trusted partner by NASA, leading to subsequent research engagements and opportunities for continued collaboration\n\nObserving the positive impact of our work firsthand when I saw the user journey posters displayed prominently within NASA facilities, demonstrating the value and impact of the research findings.`,
+        contentParts: [
+          { type: 'text', value: `This project was considered a great success. This was determined by:` },
+          { type: 'bullets', items: [
+            'Seeing our design recommendations implemented on multiple DAACs',
+            'Receiving positive feedback from NASA and DAAC stakeholders, with many expressing appreciation for the valuable insights',
+            'Being recognized as a trusted partner by NASA, leading to subsequent research engagements and opportunities for continued collaboration',
+            'Observing the positive impact of our work firsthand when I saw the user journey posters displayed prominently within NASA facilities, demonstrating the value and impact of the research findings.',
+          ]},
+        ],
       },
     ],
   },
@@ -826,8 +841,8 @@ function BodyText({ children }) {
   );
 }
 
-function BulletList({ content }) {
-  const items = String(content).split(/\n\s*\n+/).map(s => s.trim()).filter(Boolean);
+function BulletList({ content, items: itemsProp }) {
+  const items = itemsProp || String(content).split(/\n\s*\n+/).map(s => s.trim()).filter(Boolean);
   return (
     <ul style={{
       fontFamily: "'Open Sans', sans-serif", fontSize: 15,
@@ -843,6 +858,22 @@ function BulletList({ content }) {
       ))}
     </ul>
   );
+}
+
+function ContentRenderer({ content, contentParts, isOutcomes }) {
+  if (contentParts) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {contentParts.map((part, i) => {
+          if (part.type === 'text') return <BodyText key={i}>{part.value}</BodyText>;
+          if (part.type === 'bullets') return <BulletList key={i} items={part.items} />;
+          return null;
+        })}
+      </div>
+    );
+  }
+  if (isOutcomes) return <BulletList content={content} />;
+  return <BodyText>{content}</BodyText>;
 }
 
 /* In-page section nav — Poppins Medium 12px; active = muted green + dot */
@@ -1092,7 +1123,7 @@ function CaseStudyPage({ projectId, onBack, onProject }) {
                 <div key={sec.id} id={`section-${sec.id}`} className="section-anchor"
                   ref={el => anchorRefs.current[sec.id] = el} style={{ marginBottom: 48 }}>
                   <SectionHeader label={sec.label} />
-                  {sec.id === 'outcomes' ? <BulletList content={sec.content} /> : <BodyText>{sec.content}</BodyText>}
+                  <ContentRenderer content={sec.content} contentParts={sec.contentParts} isOutcomes={sec.id === 'outcomes'} />
                   {(sec.images || (sec.image ? [sec.image] : [])).map((img, idx) => (
                     <figure key={idx} style={{ marginTop: 24 }}>
                       <div style={{
