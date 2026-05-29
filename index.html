@@ -851,6 +851,15 @@ function BodyText({ children }) {
   );
 }
 
+function renderRichText(text) {
+  const parts = text.split(/(<b>.*?<\/b>)/g);
+  return parts.map((part, i) => {
+    const match = part.match(/^<b>(.*?)<\/b>$/);
+    if (match) return <strong key={i}>{match[1]}</strong>;
+    return part;
+  });
+}
+
 function BulletList({ content, items: itemsProp }) {
   const items = itemsProp || String(content).split(/\n\s*\n+/).map(s => s.trim()).filter(Boolean);
   return (
@@ -863,7 +872,7 @@ function BulletList({ content, items: itemsProp }) {
       {items.map((item, i) => (
         <li key={i} style={{ display: 'flex', gap: 14, alignItems: 'baseline' }}>
           <span style={{ flex: '0 0 6px', height: 6, borderRadius: '50%', background: C.green, marginTop: 9, transform: 'translateY(-1px)' }} />
-          <span style={{ flex: 1 }}>{item}</span>
+          <span style={{ flex: 1 }}>{renderRichText(item)}</span>
         </li>
       ))}
     </ul>
