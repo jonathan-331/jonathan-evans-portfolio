@@ -560,12 +560,27 @@ const PROJECTS = [
       },
       {
         id: 'labresearch', label: 'Lab Research', layout: 'full',
-        content: `To truly capture how people would use this product, I needed to observe their process. But it would be very awkward to ask to observe people in the shower. So I created a setup that would mirror a shower with the U by Moen installed. I did this by using an iPad with a U by Moen prototype on it to create visual and auditory feedback, displaying U by Moen interfaces on the inside and outside of the shower environment to allow for the most popular set-ups, and having white boards set up as to replicate a standard shower environment.\n\nI then asked participants that were recruited based on the likelihood of having such a product to walk me through a shower experience that they might have using an Echo with a U by Moen.`,
+        contentParts: [
+          { type: 'text', value: `To truly capture how people would use this product, I needed to observe their process. But it would be very awkward to ask to observe people in the shower. So I created a setup that would mirror a shower with the U by Moen installed. I did this by:` },
+          { type: 'bullets', items: [
+            'Using an iPad with a U by Moen prototype on it to create visual and auditory feedback',
+            'Displaying U by Moen interfaces on the inside and outside of the shower environment to allow for the most popular set-ups',
+            'Having white boards set up as to replicate a standard shower environment',
+          ]},
+          { type: 'text', value: `I then asked participants that were recruited based on the likelihood of having such a product to walk me through a shower experience that they might have using an Echo with a U by Moen.` },
+        ],
         image: { caption: 'LAB SETUP: A wide-angle view of the room where the research occurred.', src: 'assets/projects/moen/lab-setup.png', bg: '#eef2f5' },
       },
       {
         id: 'howitworks', label: 'How People Actually Wanted to Interact', layout: 'full',
-        content: `The research revealed two things: how people actually wanted to interact with the shower using their voice, and what people would really say to perform these interactions.\n\nThis helped me capture what the true terms for people would want to use for interacting with the device. In addition, it provided feedback for the client as to what people wanted to say in order to activate the Alexa Skill.`,
+        contentParts: [
+          { type: 'text', value: `The research revealed two things:` },
+          { type: 'ordered', items: [
+            'How people actually wanted to interact with the shower using their voice',
+            'What people would really say to perform these interactions',
+          ]},
+          { type: 'text', value: `This helped me capture what the true terms for people would want to use for interacting with the device. In addition, it provided feedback for the client as to what people wanted to say in order to activate the Alexa Skill.` },
+        ],
         image: { caption: 'UTTERANCES: The captured statements participants made during testing, and how they could be coded for the final prototype.', src: 'assets/projects/moen/utterances.png', bg: '#f0f4f8' },
       },
       {
@@ -575,7 +590,14 @@ const PROJECTS = [
       },
       {
         id: 'outcomes', label: 'Outcomes', layout: 'full',
-        content: `We know that this project was a success because Moen moved forward with our suggestion that they focus on the Alexa interaction, which became the initial launch of the voice interaction. They gained media attention for the implementation at events like CES. They also implemented the interactions with Apple and Google products.`,
+        contentParts: [
+          { type: 'text', value: `We know that this project was a success because Moen:` },
+          { type: 'bullets', items: [
+            'Moved forward with our suggestion that they focus on the Alexa interaction, which became the initial launch of the voice interaction',
+            'Gained media attention for the implementation at events like CES',
+            'Implemented the interactions with Apple and Google products',
+          ]},
+        ],
       },
     ],
   },
@@ -879,6 +901,24 @@ function BulletList({ content, items: itemsProp }) {
   );
 }
 
+function OrderedList({ items }) {
+  return (
+    <ol style={{
+      fontFamily: "'Open Sans', sans-serif", fontSize: 15,
+      lineHeight: 1.7, color: C.ink,
+      listStyle: 'none', padding: 0, margin: 0,
+      display: 'flex', flexDirection: 'column', gap: 10,
+    }}>
+      {items.map((item, i) => (
+        <li key={i} style={{ display: 'flex', gap: 14, alignItems: 'baseline' }}>
+          <span style={{ flex: '0 0 18px', fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: 13, color: C.green }}>{i + 1}.</span>
+          <span style={{ flex: 1 }}>{renderRichText(item)}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 function ContentRenderer({ content, contentParts, isOutcomes }) {
   if (contentParts) {
     return (
@@ -886,6 +926,7 @@ function ContentRenderer({ content, contentParts, isOutcomes }) {
         {contentParts.map((part, i) => {
           if (part.type === 'text') return <BodyText key={i}>{part.value}</BodyText>;
           if (part.type === 'bullets') return <BulletList key={i} items={part.items} />;
+          if (part.type === 'ordered') return <OrderedList key={i} items={part.items} />;
           return null;
         })}
       </div>
