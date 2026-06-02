@@ -87,6 +87,13 @@
     .case-study-title     { font-size: 28px !important; }
   }
   html, body { overflow-x: clip; }
+  .footer-wrap { display: flex; align-items: center; justify-content: space-between; padding: 28px 48px; border-top: 1px solid rgb(233,237,234); background: rgb(255,255,255); }
+  .footer-links { display: flex; gap: 28px; align-items: center; }
+  .footer-link { font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 500; color: rgb(55,126,34); text-decoration: none; letter-spacing: 0.04em; }
+  .footer-link:hover { text-decoration: underline; }
+  @media (max-width: 680px) {
+    .footer-wrap { flex-direction: column; gap: 16px; text-align: center; padding: 28px 24px; }
+  }
   .snav-dropdown {
     display: none;
     position: absolute;
@@ -1683,6 +1690,23 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "heroSize": 56
 }/*EDITMODE-END*/;
 
+function Footer({ onNav }) {
+  return (
+    <footer className="footer-wrap">
+      <img src="assets/logo-je.png" alt="JHE" onClick={() => onNav('home')}
+        style={{ height: 32, cursor: 'pointer', display: 'block' }} />
+      <div className="footer-links">
+        <a className="footer-link" href="mailto:jonathan@jonathan-evans.com">EMAIL ME</a>
+        <a className="footer-link" href="https://www.linkedin.com/in/jonathanhevans/" target="_blank" rel="noopener noreferrer">LINKEDIN</a>
+        <a className="footer-link" href="assets/resume.pdf" download>RESUME</a>
+      </div>
+      <div style={{ fontFamily: "'Poppins', sans-serif", fontSize: 12, color: '#8A8078' }}>
+        © 2026 Jonathan Hilton Evans
+      </div>
+    </footer>
+  );
+}
+
 function App() {
   const [screen, setScreen]     = useState(() => localStorage.getItem('je-v2-screen') || 'home');
   const [tweaks, setTweaks]     = useState(TWEAK_DEFAULTS);
@@ -1719,6 +1743,8 @@ function App() {
       {screen.startsWith('project-') && (
         <CaseStudyPage projectId={screen.replace('project-', '')} onBack={() => setScreen('home')} onProject={id => setScreen('project-' + id)} />
       )}
+
+      <Footer onNav={dest => setScreen(dest)} />
 
       {showTweaks && (
         <div style={{
