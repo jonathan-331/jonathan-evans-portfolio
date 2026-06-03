@@ -182,6 +182,37 @@ function NavLink({ label, active, onClick, href }) {
   );
 }
 
+/* ── RESUME PDF BUTTON ── */
+function ResumePDFButton() {
+  const [hov, setHov] = useState(false);
+  return (
+    <a
+      href="assets/resume.pdf"
+      download
+      title="Download Resume PDF"
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        display: 'inline-flex', alignItems: 'center', gap: 8,
+        padding: '8px 14px', borderRadius: 8,
+        border: `1px solid ${hov ? C.greenMuted : C.greenLight}`,
+        color: C.green, textDecoration: 'none', flexShrink: 0,
+        transition: 'border-color 0.2s, transform 0.2s, box-shadow 0.2s',
+        transform: hov ? 'translateY(-2px)' : 'translateY(0)',
+        boxShadow: hov ? '0 8px 24px rgba(0,0,0,0.05)' : 'none',
+      }}
+    >
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M8 1v9M5 7l3 3 3-3M2 12v1a1 1 0 001 1h10a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+      <span style={{
+        fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: 12,
+        letterSpacing: '0.04em',
+      }}>Resume PDF</span>
+    </a>
+  );
+}
+
 /* ── HEADER ── */
 function Header({ screen, onNav }) {
   const [scrolled, setScrolled] = useState(false);
@@ -1543,15 +1574,7 @@ function ResumePage() {
               )}
             </div>
           </div>
-          <a href="assets/resume.pdf" download title="Download PDF" style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: 36, height: 36, borderRadius: 8,
-            border: `1px solid ${C.greenLight}`, color: C.green, flexShrink: 0,
-          }}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 1v9M5 7l3 3 3-3M2 12v1a1 1 0 001 1h10a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </a>
+          <ResumePDFButton />
         </div>
       </div>
 
@@ -1698,7 +1721,7 @@ function Footer({ onNav }) {
       <div className="footer-links">
         <a className="footer-link" href="mailto:jonathan@jonathan-evans.com">EMAIL ME</a>
         <a className="footer-link" href="https://www.linkedin.com/in/jonathanhevans/" target="_blank" rel="noopener noreferrer">LINKEDIN</a>
-        <a className="footer-link" href="assets/resume.pdf" download>RESUME</a>
+        <ResumePDFButton />
       </div>
       <div style={{ fontFamily: "'Poppins', sans-serif", fontSize: 12, color: '#8A8078' }}>
         © 2026 Jonathan Hilton Evans
