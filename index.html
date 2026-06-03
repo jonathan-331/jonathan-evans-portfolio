@@ -152,7 +152,7 @@ function useFadeIn(delay = 0) {
   return ref;
 }
 
-/* ── NAV LINK — Poppins Medium 12px green; active = muted green + dot ── */
+/* ── NAV LINK — Poppins Medium 12px green; active = muted green + underline ── */
 function NavLink({ label, active, onClick, href }) {
   const [hov, setHov] = useState(false);
   return (
@@ -169,14 +169,17 @@ function NavLink({ label, active, onClick, href }) {
         fontSize: 12,
         lineHeight: 1,
         color: active ? C.greenMuted : C.green,
-        textDecoration: (!active && hov) ? 'underline' : 'none',
+        textDecoration: active ? 'underline' : 'none',
+        textUnderlineOffset: '5px',
         cursor: 'pointer',
         letterSpacing: '0.01em',
         display: 'flex',
         alignItems: 'center',
-        gap: 5,
+        padding: '5px 8px',
+        borderRadius: 6,
+        background: (hov && !active) ? C.warmWhite : 'transparent',
+        transition: 'background 0.15s ease',
       }}>
-      {active && <span style={{ width: 5, height: 5, borderRadius: '50%', background: C.greenMuted, flexShrink: 0, display: 'inline-block' }} />}
       {label}
     </a>
   );
@@ -207,7 +210,7 @@ function ResumePDFButton() {
       </svg>
       <span style={{
         fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: 12,
-        letterSpacing: '0.04em',
+        letterSpacing: '0.04em', textTransform: 'uppercase',
       }}>Resume PDF</span>
     </a>
   );
