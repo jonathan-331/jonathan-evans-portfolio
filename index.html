@@ -1011,6 +1011,7 @@ function HomePage({ onProject }) {
   const heroRef    = useFadeIn(60);
   const taglineRef = useFadeIn(140);
   const btnRef     = useFadeIn(220);
+  const [btnHov, setBtnHov] = useState(false);
   return (
     <main className="home-main" style={{ paddingTop: 110, paddingBottom: 120, paddingLeft: 80, paddingRight: 80, maxWidth: 1200, margin: '0 auto' }}>
 
@@ -1037,14 +1038,17 @@ function HomePage({ onProject }) {
       {/* CTA button */}
       <div ref={btnRef} className="fade-in" style={{ marginBottom: 80 }}>
         <button onClick={() => onProject('gates')}
+          onMouseEnter={() => setBtnHov(true)}
+          onMouseLeave={() => setBtnHov(false)}
           style={{
             fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: 14,
-            color: C.white, background: C.green,
+            color: C.white, background: btnHov ? 'rgb(44,101,27)' : C.green,
             border: 'none', borderRadius: 6,
             padding: '10px 20px',
             cursor: 'pointer',
             display: 'inline-flex', alignItems: 'center', gap: 10,
             letterSpacing: '0.01em',
+            transition: 'background 0.15s ease',
           }}>
           Explore My Portfolio <span style={{ fontSize: 16 }}>→</span>
         </button>
